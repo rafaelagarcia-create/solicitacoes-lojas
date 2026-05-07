@@ -132,7 +132,7 @@ tbody tr:hover td{background:#FAFAF8}
 
     <div class="config-banner" id="config-banner">
       <strong>⚙️ Configuração necessária</strong>
-      Abra este arquivo em um editor de texto e substitua <code>COLE_AQUI_A_URL_DO_SCRIPT</code> pela URL do seu Google Apps Script.
+      Abra este arquivo em um editor de texto e substitua <code>https://script.google.com/macros/s/AKfycbyGskfmdceePoP2xuCtojnQWx6JDFB9NnHLzCrwK8JxnECeOG2-emaNVcDgohidGjXi/exec</code> pela URL do seu Google Apps Script.
     </div>
 
     <div class="metrics">
@@ -220,7 +220,7 @@ tbody tr:hover td{background:#FAFAF8}
 
 <script>
 // ⚠️ SUBSTITUA A URL ABAIXO PELA URL DO SEU GOOGLE APPS SCRIPT
-const SCRIPT_URL = 'COLE_AQUI_A_URL_DO_SCRIPT';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyGskfmdceePoP2xuCtojnQWx6JDFB9NnHLzCrwK8JxnECeOG2-emaNVcDgohidGjXi/exec';
 
 const LOJAS=['7891 - Shopping','5188 - Assaí','14441 - Metro','23419 - Max','20086 - Bonfiglioli','8951 - Rio Pequeno'];
 const STATUS_MAP={Pendente:'badge-pendente','Em andamento':'badge-em-andamento',Alerta:'badge-alerta','Crítico':'badge-critico',Concluído:'badge-concluido'};
@@ -228,7 +228,7 @@ const STATUS_MAP={Pendente:'badge-pendente','Em andamento':'badge-em-andamento',
 let allData=[];
 let currentId=null;
 
-if(SCRIPT_URL==='COLE_AQUI_A_URL_DO_SCRIPT') document.getElementById('config-banner').classList.add('show');
+if(SCRIPT_URL==='https://script.google.com/macros/s/AKfycbyGskfmdceePoP2xuCtojnQWx6JDFB9NnHLzCrwK8JxnECeOG2-emaNVcDgohidGjXi/exec') document.getElementById('config-banner').classList.add('show');
 
 async function loadData(){
   const btn=document.getElementById('btn-refresh');
@@ -378,7 +378,7 @@ function showToast(msg){
 }
 
 document.getElementById('footer-date').textContent=new Date().toLocaleDateString('pt-BR');
-if(SCRIPT_URL!=='COLE_AQUI_A_URL_DO_SCRIPT') loadData();
+if(SCRIPT_URL!=='https://script.google.com/macros/s/AKfycbyGskfmdceePoP2xuCtojnQWx6JDFB9NnHLzCrwK8JxnECeOG2-emaNVcDgohidGjXi/exec') loadData();
 </script>
 </body>
 </html>
