@@ -55,7 +55,6 @@ tbody tr:hover td{background:#FAFAF8}
 .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
 .badge-pendente{background:var(--purple-light);color:var(--purple-text)}
 .badge-em-andamento{background:var(--blue-light);color:var(--blue-text)}
-.badge-ok{background:var(--green-light);color:var(--green-text)}
 .badge-alerta{background:var(--amber-light);color:var(--amber-text)}
 .badge-critico{background:var(--red-light);color:var(--red-text)}
 .badge-concluido{background:var(--green-light);color:var(--green-text)}
@@ -71,7 +70,6 @@ tbody tr:hover td{background:#FAFAF8}
 .form-row{margin-bottom:14px}
 .form-row label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:500}
 .form-row select,.form-row textarea,.form-row input{width:100%;font-family:var(--font);font-size:13px;padding:9px 12px;border:0.5px solid var(--border-med);border-radius:var(--radius);background:var(--surface);color:var(--text);outline:none}
-.form-row select:focus,.form-row textarea:focus{border-color:var(--green)}
 .form-row textarea{resize:vertical;min-height:72px}
 .detail-block{background:var(--bg);border-radius:var(--radius);padding:12px 14px;margin-bottom:12px}
 .detail-title{font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:var(--hint);margin-bottom:8px;font-weight:500}
@@ -89,8 +87,6 @@ tbody tr:hover td{background:#FAFAF8}
 .bar-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
 .bar-track{height:5px;background:var(--bg);border-radius:3px;overflow:hidden}
 .bar-fill{height:100%;border-radius:3px}
-.config-banner{background:#FFF8E7;border:1px solid #F5D678;border-radius:var(--radius);padding:12px 16px;margin-bottom:1.25rem;font-size:13px;color:#7A5C00;display:none}
-.config-banner.show{display:block}
 .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--text);color:#fff;padding:10px 18px;border-radius:var(--radius);font-size:13px;font-weight:500;opacity:0;transform:translateY(10px);transition:all 0.25s;z-index:999;pointer-events:none}
@@ -116,11 +112,10 @@ tbody tr:hover td{background:#FAFAF8}
       Resumo
     </button>
   </nav>
-  <div class="sidebar-footer">6 lojas · <span id="footer-count">0</span> solicitações<br><span id="footer-date"></span></div>
+  <div class="sidebar-footer">6 lojas &middot; <span id="footer-count">0</span> solicitações<br><span id="footer-date"></span></div>
 </aside>
 
 <main class="main">
-
   <div class="page active" id="page-solicitacoes">
     <div class="topbar">
       <h1>Solicitações</h1>
@@ -129,19 +124,12 @@ tbody tr:hover td{background:#FAFAF8}
         Atualizar
       </button>
     </div>
-
-    <div class="config-banner" id="config-banner">
-      <strong>⚙️ Configuração necessária</strong>
-      Abra este arquivo em um editor de texto e substitua <code>https://script.google.com/macros/s/AKfycbyGskfmdceePoP2xuCtojnQWx6JDFB9NnHLzCrwK8JxnECeOG2-emaNVcDgohidGjXi/exec</code> pela URL do seu Google Apps Script.
-    </div>
-
     <div class="metrics">
       <div class="metric-card accent-blue"><div class="metric-label">Total</div><div class="metric-value" id="m-total">—</div><div class="metric-sub">solicitações</div></div>
       <div class="metric-card accent-amber"><div class="metric-label">Pendentes</div><div class="metric-value" id="m-pend">—</div><div class="metric-sub">aguardando</div></div>
       <div class="metric-card accent-green"><div class="metric-label">Concluídas</div><div class="metric-value" id="m-conc">—</div><div class="metric-sub">finalizadas</div></div>
       <div class="metric-card accent-red"><div class="metric-label">Alertas</div><div class="metric-value" id="m-alert">—</div><div class="metric-sub">atenção</div></div>
     </div>
-
     <div class="toolbar">
       <select id="f-loja" onchange="renderTable()">
         <option value="">Todas as lojas</option>
@@ -160,7 +148,6 @@ tbody tr:hover td{background:#FAFAF8}
       </select>
       <span id="tbl-count" style="font-size:12px;color:var(--hint);margin-left:2px"></span>
     </div>
-
     <div class="table-card">
       <table>
         <thead><tr><th>ID</th><th>Loja</th><th>Gerente</th><th>Itens</th><th>Data</th><th>Status</th><th>Ação</th></tr></thead>
@@ -182,19 +169,17 @@ tbody tr:hover td{background:#FAFAF8}
       <div class="resumo-card"><h4>Por status</h4><div id="chart-status"></div></div>
     </div>
   </div>
-
 </main>
 </div>
 
-<!-- MODAL -->
 <div class="modal-overlay" id="modal-det">
   <div class="modal">
-    <button class="modal-close" onclick="closeModal()">✕</button>
+    <button class="modal-close" onclick="closeModal()">&#x2715;</button>
     <h3 id="modal-title">Solicitação</h3>
     <div class="info-grid" id="modal-info"></div>
     <div id="modal-provadores"></div>
     <div id="modal-embalagens"></div>
-    <div class="detail-block" id="modal-obs-block">
+    <div class="detail-block">
       <div class="detail-title">Observação da gerente</div>
       <div id="modal-obs" style="font-size:13px;color:var(--muted)"></div>
     </div>
@@ -207,7 +192,7 @@ tbody tr:hover td{background:#FAFAF8}
     </div>
     <div class="form-row">
       <label>Resposta / observação interna</label>
-      <textarea id="edit-resposta" placeholder="Adicione uma resposta ou anotação interna..."></textarea>
+      <textarea id="edit-resposta" placeholder="Adicione uma anotação interna..."></textarea>
     </div>
     <div class="modal-footer">
       <button class="btn" onclick="closeModal()">Cancelar</button>
@@ -219,166 +204,192 @@ tbody tr:hover td{background:#FAFAF8}
 <div class="toast" id="toast"></div>
 
 <script>
-// ⚠️ SUBSTITUA A URL ABAIXO PELA URL DO SEU GOOGLE APPS SCRIPT
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyGskfmdceePoP2xuCtojnQWx6JDFB9NnHLzCrwK8JxnECeOG2-emaNVcDgohidGjXi/exec';
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyGskfmdceePoP2xuCtojnQWx6JDFB9NnHLzCrwK8JxnECeOG2-emaNVcDgohidGjXi/exec';
+var LOJAS = ['7891 - Shopping','5188 - Assaí','14441 - Metro','23419 - Max','20086 - Bonfiglioli','8951 - Rio Pequeno'];
+var STATUS_MAP = {
+  'Pendente':'badge-pendente',
+  'Em andamento':'badge-em-andamento',
+  'Alerta':'badge-alerta',
+  'Crítico':'badge-critico',
+  'Concluído':'badge-concluido'
+};
+var allData = [];
+var currentId = null;
 
-const LOJAS=['7891 - Shopping','5188 - Assaí','14441 - Metro','23419 - Max','20086 - Bonfiglioli','8951 - Rio Pequeno'];
-const STATUS_MAP={Pendente:'badge-pendente','Em andamento':'badge-em-andamento',Alerta:'badge-alerta','Crítico':'badge-critico',Concluído:'badge-concluido'};
-
-let allData=[];
-let currentId=null;
-
-if(SCRIPT_URL==='https://script.google.com/macros/s/AKfycbyGskfmdceePoP2xuCtojnQWx6JDFB9NnHLzCrwK8JxnECeOG2-emaNVcDgohidGjXi/exec';
-
-async function loadData(){
-  const btn=document.getElementById('btn-refresh');
-  btn.innerHTML='<span class="spinner" style="border-top-color:var(--green);border-color:var(--border-med)"></span> Carregando...';
-  btn.disabled=true;
-  try{
-    const resp=await fetch(SCRIPT_URL+'?action=READ');
-    const data=await resp.json();
-    allData=Array.isArray(data)?data:[];
-    document.getElementById('footer-count').textContent=allData.length;
+async function loadData() {
+  var btn = document.getElementById('btn-refresh');
+  btn.innerHTML = '<span class="spinner"></span> Carregando...';
+  btn.disabled = true;
+  try {
+    var resp = await fetch(SCRIPT_URL + '?action=READ');
+    var data = await resp.json();
+    allData = Array.isArray(data) ? data : [];
+    document.getElementById('footer-count').textContent = allData.length;
     renderTable();
     renderResumo();
     showToast('Dados atualizados!');
-  }catch(e){
-    showToast('Erro ao carregar dados.');
+  } catch(e) {
+    showToast('Erro ao carregar: ' + e.message);
   }
-  btn.innerHTML='<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Atualizar';
-  btn.disabled=false;
+  btn.innerHTML = '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Atualizar';
+  btn.disabled = false;
 }
 
-function renderTable(){
-  const loja=document.getElementById('f-loja').value;
-  const status=document.getElementById('f-status').value;
-  const tipo=document.getElementById('f-tipo').value;
-  let rows=allData.filter(s=>{
-    if(loja&&s.loja!==loja)return false;
-    if(status&&s.status!==status)return false;
-    if(tipo==='prov'&&!(s.provadores&&s.provadores.length))return false;
-    if(tipo==='emb'&&!(s.embalagens&&s.embalagens.length))return false;
+function renderTable() {
+  var loja = document.getElementById('f-loja').value;
+  var status = document.getElementById('f-status').value;
+  var tipo = document.getElementById('f-tipo').value;
+  var rows = allData.filter(function(s) {
+    if (loja && s.loja !== loja) return false;
+    if (status && s.status !== status) return false;
+    if (tipo === 'prov' && !(s.provadores && s.provadores.length)) return false;
+    if (tipo === 'emb' && !(s.embalagens && s.embalagens.length)) return false;
     return true;
-  }).sort((a,b)=>new Date(b.data)-new Date(a.data));
+  }).sort(function(a,b){ return new Date(b.data) - new Date(a.data); });
 
-  document.getElementById('tbl-count').textContent=rows.length+' registro(s)';
-  document.getElementById('m-total').textContent=allData.length;
-  document.getElementById('m-pend').textContent=allData.filter(s=>s.status==='Pendente').length;
-  document.getElementById('m-conc').textContent=allData.filter(s=>s.status==='Concluído').length;
-  document.getElementById('m-alert').textContent=allData.filter(s=>s.status==='Alerta'||s.status==='Crítico').length;
+  document.getElementById('tbl-count').textContent = rows.length + ' registro(s)';
+  document.getElementById('m-total').textContent = allData.length;
+  document.getElementById('m-pend').textContent = allData.filter(function(s){ return s.status === 'Pendente'; }).length;
+  document.getElementById('m-conc').textContent = allData.filter(function(s){ return s.status === 'Concluído'; }).length;
+  document.getElementById('m-alert').textContent = allData.filter(function(s){ return s.status === 'Alerta' || s.status === 'Crítico'; }).length;
 
-  const tb=document.getElementById('tbody-sol');
-  if(!rows.length){tb.innerHTML='<tr><td colspan="7"><div class="empty">Nenhuma solicitação encontrada.</div></td></tr>';return;}
-  tb.innerHTML=rows.map(s=>{
-    const np=s.provadores?s.provadores.length:0;
-    const ne=s.embalagens?s.embalagens.length:0;
-    const tags=[
-      np?`<span style="font-size:11px;background:var(--purple-light);color:var(--purple-text);padding:2px 7px;border-radius:10px">${np} prov.</span>`:'',
-      ne?`<span style="font-size:11px;background:var(--blue-light);color:var(--blue-text);padding:2px 7px;border-radius:10px">${ne} emb.</span>`:''
-    ].filter(Boolean).join(' ');
-    const dt=new Date(s.data).toLocaleDateString('pt-BR');
-    const cls=STATUS_MAP[s.status]||'badge-pendente';
-    return `<tr>
-      <td><span style="font-family:var(--mono);font-size:11px;color:var(--hint)">${(s.id||'').slice(-10)}</span></td>
-      <td><span class="loja-chip">${s.loja}</span></td>
-      <td style="font-weight:500">${s.gerente}</td>
-      <td style="display:flex;gap:4px;flex-wrap:wrap;padding-top:14px">${tags||'—'}</td>
-      <td style="color:var(--muted);font-size:12px">${dt}</td>
-      <td><span class="badge ${cls}">${s.status}</span></td>
-      <td><button class="btn btn-sm btn-primary" onclick='openDetail(${JSON.stringify(s.id)})'>Ver / Editar</button></td>
-    </tr>`;
+  var tb = document.getElementById('tbody-sol');
+  if (!rows.length) {
+    tb.innerHTML = '<tr><td colspan="7"><div class="empty">Nenhuma solicitação encontrada.</div></td></tr>';
+    return;
+  }
+  tb.innerHTML = rows.map(function(s) {
+    var np = s.provadores ? s.provadores.length : 0;
+    var ne = s.embalagens ? s.embalagens.length : 0;
+    var tags = '';
+    if (np) tags += '<span style="font-size:11px;background:var(--purple-light);color:var(--purple-text);padding:2px 7px;border-radius:10px">' + np + ' prov.</span> ';
+    if (ne) tags += '<span style="font-size:11px;background:var(--blue-light);color:var(--blue-text);padding:2px 7px;border-radius:10px">' + ne + ' emb.</span>';
+    var dt = new Date(s.data).toLocaleDateString('pt-BR');
+    var cls = STATUS_MAP[s.status] || 'badge-pendente';
+    var sid = String(s.id || '');
+    return '<tr>' +
+      '<td><span style="font-family:var(--mono);font-size:11px;color:var(--hint)">' + sid.slice(-10) + '</span></td>' +
+      '<td><span class="loja-chip">' + s.loja + '</span></td>' +
+      '<td style="font-weight:500">' + s.gerente + '</td>' +
+      '<td>' + (tags || '—') + '</td>' +
+      '<td style="color:var(--muted);font-size:12px">' + dt + '</td>' +
+      '<td><span class="badge ' + cls + '">' + s.status + '</span></td>' +
+      '<td><button class="btn btn-sm btn-primary" onclick="openDetail(\'' + sid + '\')">Ver / Editar</button></td>' +
+    '</tr>';
   }).join('');
 }
 
-function openDetail(id){
-  const s=allData.find(x=>x.id==id);
-  if(!s)return;
-  currentId=id;
-  document.getElementById('modal-title').textContent='Solicitação '+s.id;
-  document.getElementById('modal-info').innerHTML=`
-    <div class="info-item"><span>LOJA</span><span>${s.loja}</span></div>
-    <div class="info-item"><span>GERENTE</span><span>${s.gerente}</span></div>
-    <div class="info-item"><span>DATA</span><span>${new Date(s.data).toLocaleString('pt-BR')}</span></div>
-    <div class="info-item"><span>STATUS</span><span><span class="badge ${STATUS_MAP[s.status]||'badge-pendente'}">${s.status}</span></span></div>
-  `;
-  const mp=document.getElementById('modal-provadores');
-  if(s.provadores&&s.provadores.length){
-    mp.innerHTML='<div class="detail-block"><div class="detail-title">Provadores ('+s.provadores.length+')</div>'+
-      s.provadores.map(p=>`<div class="detail-item"><div><div style="font-weight:500">${p.nome}</div><span class="sku-tag">SKU ${p.codigo}</span></div><span class="qty-tag">Qtd ${p.qtd}</span></div>`).join('')+
+function openDetail(id) {
+  var s = null;
+  for (var i = 0; i < allData.length; i++) {
+    if (String(allData[i].id) === String(id)) { s = allData[i]; break; }
+  }
+  if (!s) return;
+  currentId = id;
+  document.getElementById('modal-title').textContent = 'Solicitação ' + s.id;
+  document.getElementById('modal-info').innerHTML =
+    '<div class="info-item"><span>LOJA</span><span>' + s.loja + '</span></div>' +
+    '<div class="info-item"><span>GERENTE</span><span>' + s.gerente + '</span></div>' +
+    '<div class="info-item"><span>DATA</span><span>' + new Date(s.data).toLocaleString('pt-BR') + '</span></div>' +
+    '<div class="info-item"><span>STATUS</span><span><span class="badge ' + (STATUS_MAP[s.status]||'badge-pendente') + '">' + s.status + '</span></span></div>';
+
+  var mp = document.getElementById('modal-provadores');
+  if (s.provadores && s.provadores.length) {
+    mp.innerHTML = '<div class="detail-block"><div class="detail-title">Provadores (' + s.provadores.length + ')</div>' +
+      s.provadores.map(function(p){ return '<div class="detail-item"><div><div style="font-weight:500">' + p.nome + '</div><span class="sku-tag">SKU ' + p.codigo + '</span></div><span class="qty-tag">Qtd ' + p.qtd + '</span></div>'; }).join('') +
     '</div>';
-  }else mp.innerHTML='';
-  const me=document.getElementById('modal-embalagens');
-  if(s.embalagens&&s.embalagens.length){
-    me.innerHTML='<div class="detail-block"><div class="detail-title">Embalagens ('+s.embalagens.length+')</div>'+
-      s.embalagens.map(e=>`<div class="detail-item"><span>${e.item}</span><span class="qty-tag">Qtd ${e.qtd}</span></div>`).join('')+
+  } else { mp.innerHTML = ''; }
+
+  var me = document.getElementById('modal-embalagens');
+  if (s.embalagens && s.embalagens.length) {
+    me.innerHTML = '<div class="detail-block"><div class="detail-title">Embalagens (' + s.embalagens.length + ')</div>' +
+      s.embalagens.map(function(e){ return '<div class="detail-item"><span>' + e.item + '</span><span class="qty-tag">Qtd ' + e.qtd + '</span></div>'; }).join('') +
     '</div>';
-  }else me.innerHTML='';
-  document.getElementById('modal-obs').textContent=s.obs||'(nenhuma)';
-  document.getElementById('edit-status').value=s.status||'Pendente';
-  document.getElementById('edit-resposta').value=s.resposta||'';
+  } else { me.innerHTML = ''; }
+
+  document.getElementById('modal-obs').textContent = s.obs || '(nenhuma)';
+  document.getElementById('edit-status').value = s.status || 'Pendente';
+  document.getElementById('edit-resposta').value = s.resposta || '';
   document.getElementById('modal-det').classList.add('open');
 }
 
-async function saveEdit(){
-  const btn=document.getElementById('btn-save');
-  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Salvando...';
-  const status=document.getElementById('edit-status').value;
-  const resposta=document.getElementById('edit-resposta').value;
-  try{
-    const resp=await fetch(SCRIPT_URL,{
-      method:'POST',
-      body:JSON.stringify({action:'UPDATE',id:currentId,status,resposta})
+async function saveEdit() {
+  var btn = document.getElementById('btn-save');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Salvando...';
+  var status = document.getElementById('edit-status').value;
+  var resposta = document.getElementById('edit-resposta').value;
+  try {
+    var resp = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'UPDATE', id: currentId, status: status, resposta: resposta })
     });
     await resp.json();
-    const idx=allData.findIndex(x=>x.id==currentId);
-    if(idx>=0){allData[idx].status=status;allData[idx].resposta=resposta;}
-    closeModal();renderTable();renderResumo();
+    for (var i = 0; i < allData.length; i++) {
+      if (String(allData[i].id) === String(currentId)) {
+        allData[i].status = status;
+        allData[i].resposta = resposta;
+        break;
+      }
+    }
+    closeModal();
+    renderTable();
+    renderResumo();
     showToast('Status atualizado com sucesso!');
-  }catch(e){showToast('Erro ao salvar.');}
-  btn.disabled=false;btn.innerHTML='Salvar alterações';
+  } catch(e) {
+    showToast('Erro ao salvar: ' + e.message);
+  }
+  btn.disabled = false;
+  btn.innerHTML = 'Salvar alterações';
 }
 
-function closeModal(){document.getElementById('modal-det').classList.remove('open');}
-document.getElementById('modal-det').addEventListener('click',e=>{if(e.target===document.getElementById('modal-det'))closeModal();});
+function closeModal() { document.getElementById('modal-det').classList.remove('open'); }
+document.getElementById('modal-det').addEventListener('click', function(e) {
+  if (e.target === document.getElementById('modal-det')) closeModal();
+});
 
-function renderResumo(){
-  document.getElementById('r-total').textContent=allData.length;
-  document.getElementById('r-pend').textContent=allData.filter(s=>s.status==='Pendente').length;
-  document.getElementById('r-conc').textContent=allData.filter(s=>s.status==='Concluído').length;
-  document.getElementById('r-alert').textContent=allData.filter(s=>s.status==='Alerta'||s.status==='Crítico').length;
-  const maxL=Math.max(...LOJAS.map(l=>allData.filter(s=>s.loja===l).length),1);
-  document.getElementById('chart-loja').innerHTML=LOJAS.map(l=>{
-    const n=allData.filter(s=>s.loja===l).length;
-    return bar(l.split(' - ').pop(),n,Math.round(n/maxL*100),'var(--green)');
+function renderResumo() {
+  document.getElementById('r-total').textContent = allData.length;
+  document.getElementById('r-pend').textContent = allData.filter(function(s){ return s.status === 'Pendente'; }).length;
+  document.getElementById('r-conc').textContent = allData.filter(function(s){ return s.status === 'Concluído'; }).length;
+  document.getElementById('r-alert').textContent = allData.filter(function(s){ return s.status === 'Alerta' || s.status === 'Crítico'; }).length;
+
+  var maxL = Math.max.apply(null, LOJAS.map(function(l){ return allData.filter(function(s){ return s.loja === l; }).length; }).concat([1]));
+  document.getElementById('chart-loja').innerHTML = LOJAS.map(function(l) {
+    var n = allData.filter(function(s){ return s.loja === l; }).length;
+    return bar(l.split(' - ').pop(), n, Math.round(n/maxL*100), 'var(--green)');
   }).join('');
-  const sts=['Pendente','Em andamento','Alerta','Crítico','Concluído'];
-  const sc={'Pendente':'var(--purple)','Em andamento':'var(--blue)','Alerta':'var(--amber)','Crítico':'var(--red)','Concluído':'var(--green)'};
-  const maxS=Math.max(...sts.map(s=>allData.filter(x=>x.status===s).length),1);
-  document.getElementById('chart-status').innerHTML=sts.map(s=>{
-    const n=allData.filter(x=>x.status===s).length;
-    return bar(s,n,Math.round(n/maxS*100),sc[s]);
+
+  var sts = ['Pendente','Em andamento','Alerta','Crítico','Concluído'];
+  var sc = {'Pendente':'var(--purple)','Em andamento':'var(--blue)','Alerta':'var(--amber)','Crítico':'var(--red)','Concluído':'var(--green)'};
+  var maxS = Math.max.apply(null, sts.map(function(s){ return allData.filter(function(x){ return x.status === s; }).length; }).concat([1]));
+  document.getElementById('chart-status').innerHTML = sts.map(function(s) {
+    var n = allData.filter(function(x){ return x.status === s; }).length;
+    return bar(s, n, Math.round(n/maxS*100), sc[s]);
   }).join('');
 }
 
-function bar(label,value,pct,color){
-  return `<div class="bar-row"><div class="bar-label"><span style="color:var(--muted)">${label}</span><span style="font-family:var(--mono);font-weight:500">${value}</span></div><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div></div>`;
+function bar(label, value, pct, color) {
+  return '<div class="bar-row"><div class="bar-label"><span style="color:var(--muted)">' + label + '</span><span style="font-family:var(--mono);font-weight:500">' + value + '</span></div><div class="bar-track"><div class="bar-fill" style="width:' + pct + '%;background:' + color + '"></div></div></div>';
 }
 
-function navigate(page,btn){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById('page-'+page).classList.add('active');
+function navigate(page, btn) {
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+  document.getElementById('page-' + page).classList.add('active');
   btn.classList.add('active');
-  if(page==='resumo')renderResumo();
+  if (page === 'resumo') renderResumo();
 }
 
-function showToast(msg){
-  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2500);
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2500);
 }
 
-document.getElementById('footer-date').textContent=new Date().toLocaleDateString('pt-BR');
-if(SCRIPT_URL!=='https://script.google.com/macros/s/AKfycbyGskfmdceePoP2xuCtojnQWx6JDFB9NnHLzCrwK8JxnECeOG2-emaNVcDgohidGjXi/exec') loadData();
+document.getElementById('footer-date').textContent = new Date().toLocaleDateString('pt-BR');
+loadData();
 </script>
 </body>
 </html>
