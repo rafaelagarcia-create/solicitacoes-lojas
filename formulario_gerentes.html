@@ -1,1 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solicitação de Materiais</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--green:#1D9E75;--green-dark:#0F6E56;--green-light:#EAF7F1;--border:#E2E8E4;--bg:#F4F7F5;--surface:#fff;--text:#1C2B24;--muted:#6B7D74;--hint:#A8B8B0;--red:#E24B4A;--red-light:#FEF2F2;--font:'Sora',sans-serif;--radius:12px}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh}
+.header{background:var(--green);padding:2rem 1.5rem 1.5rem;color:#fff;text-align:center}
+.header .brand{font-size:11px;letter-spacing:0.12em;text-transform:uppercase;opacity:0.7;margin-bottom:6px}
+.header h1{font-size:22px;font-weight:700;line-height:1.2}
+.header p{font-size:13px;opacity:0.8;margin-top:6px}
+.content{max-width:560px;margin:0 auto;padding:1.5rem 1rem 4rem}
+.card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:1rem;overflow:hidden}
+.card-header{padding:1rem 1.25rem 0.75rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.card-icon{width:32px;height:32px;border-radius:8px;background:var(--green-light);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.card-header h2{font-size:14px;font-weight:600}
+.card-header p{font-size:12px;color:var(--muted)}
+.card-body{padding:1.25rem}
+.field{margin-bottom:1rem}.field:last-child{margin-bottom:0}
+label{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.04em}
+.req{color:var(--red)}
+input[type=text],input[type=number],select,textarea{width:100%;font-family:var(--font);font-size:14px;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text);outline:none;transition:border-color 0.15s;-webkit-appearance:none;appearance:none}
+input:focus,select:focus,textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(29,158,117,0.12)}
+textarea{resize:vertical;min-height:72px}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B7D74' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+.sku-hint{font-size:12px;color:var(--green-dark);background:var(--green-light);border-radius:8px;padding:8px 12px;margin-top:6px;display:none;font-weight:500}
+.sku-hint.show{display:block}
+.sku-hint.error{background:var(--red-light);color:var(--red)}
+.sku-small{font-size:11px;color:var(--hint);margin-top:4px}
+.items-list{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.item-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:start;background:#F9FBFA;border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+.item-name{font-size:13px;font-weight:500;padding-top:4px}
+.item-sub{font-size:11px;color:var(--muted)}
+.item-row input[type=number]{width:80px;text-align:center}
+.rm{background:none;border:none;cursor:pointer;color:var(--hint);font-size:18px;padding:0 4px;line-height:1;margin-top:2px}
+.rm:hover{color:var(--red)}
+.add-row{display:grid;grid-template-columns:1fr 90px auto;gap:8px;align-items:end}
+.btn-add{background:var(--green-light);color:var(--green-dark);border:1.5px dashed var(--green);border-radius:10px;font-family:var(--font);font-size:13px;font-weight:500;padding:11px 14px;cursor:pointer;white-space:nowrap}
+.btn-add:hover{background:#d5f0e7}
+.submit-wrap{margin-top:1.5rem}
+.btn-submit{width:100%;background:var(--green);color:#fff;font-family:var(--font);font-size:15px;font-weight:600;padding:14px;border:none;border-radius:var(--radius);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background 0.15s}
+.btn-submit:hover{background:var(--green-dark)}
+.btn-submit:disabled{opacity:0.6;cursor:not-allowed}
+.success{display:none;text-align:center;padding:3rem 1.5rem}
+.check-circle{width:64px;height:64px;background:var(--green-light);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem}
+.success h2{font-size:20px;font-weight:700;margin-bottom:8px}
+.success p{font-size:14px;color:var(--muted);line-height:1.6}
+.btn-novo{margin-top:1.5rem;background:none;border:1.5px solid var(--green);color:var(--green);font-family:var(--font);font-size:14px;font-weight:500;padding:10px 24px;border-radius:10px;cursor:pointer}
+.btn-novo:hover{background:var(--green-light)}
+.loading-screen{position:fixed;inset:0;background:var(--green);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;z-index:999;transition:opacity 0.4s}
+.loading-screen.hidden{opacity:0;pointer-events:none}
+.loading-screen h2{font-size:18px;font-weight:600;margin-top:1rem}
+.loading-screen p{font-size:13px;opacity:0.8;margin-top:6px}
+.progress{width:200px;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;margin-top:1.5rem;overflow:hidden}
+.progress-bar{height:100%;background:#fff;border-radius:2px;width:0;transition:width 0.3s}
+.spinner{width:40px;height:40px;border:3px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite}
+.btn-spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:spin 0.6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
 
+<!-- LOADING SCREEN -->
+<div class="loading-screen" id="loading-screen">
+  <div class="spinner"></div>
+  <h2>Carregando catálogo...</h2>
+  <p>Aguarde um momento</p>
+  <div class="progress"><div class="progress-bar" id="progress-bar"></div></div>
+</div>
+
+<div class="header">
+  <div class="brand">O Boticário</div>
+  <h1>Solicitação de Materiais</h1>
+  <p>Preencha o formulário para registrar sua solicitação</p>
+</div>
+
+<div class="content">
+  <div id="form-area">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon"><svg width="16" height="16" fill="none" stroke="#1D9E75" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div><h2>Identificação</h2><p>Dados da loja e responsável</p></div>
+      </div>
+      <div class="card-body">
+        <div class="field">
+          <label>Loja <span class="req">*</span></label>
+          <select id="f-loja">
+            <option value="">Selecione a loja</option>
+            <option>7891 - Shopping</option><option>5188 - Assaí</option>
+            <option>14441 - Metro</option><option>23419 - Max</option>
+            <option>20086 - Bonfiglioli</option><option>8951 - Rio Pequeno</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Gerente responsável <span class="req">*</span></label>
+          <input type="text" id="f-gerente" placeholder="Seu nome completo">
+        </div>
+        <div class="field">
+          <label>Observação geral</label>
+          <textarea id="f-obs" placeholder="Alguma informação importante?"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon"><svg width="16" height="16" fill="none" stroke="#1D9E75" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M12 7V5M12 17v2"/></svg></div>
+        <div><h2>Provadores</h2><p>Produtos que precisam de demonstrador</p></div>
+      </div>
+      <div class="card-body">
+        <div class="items-list" id="prov-list"><div style="font-size:12px;color:var(--hint);padding:4px 0">Nenhum produto adicionado ainda.</div></div>
+        <div class="add-row">
+          <div>
+            <label>Código do produto</label>
+            <input type="text" id="prov-sku" placeholder="Ex: 48130" oninput="previewProv()">
+            <div class="sku-hint" id="prov-hint"></div>
+            <div class="sku-small">Nome preenche automaticamente</div>
+          </div>
+          <div><label>Qtd</label><input type="number" id="prov-qtd" min="1" value="1"></div>
+          <div><label style="visibility:hidden">x</label><button class="btn-add" onclick="addProv()">+ Add</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon"><svg width="16" height="16" fill="none" stroke="#1D9E75" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
+        <div><h2>Embalagens (Antilhas)</h2><p>Materiais necessários</p></div>
+      </div>
+      <div class="card-body">
+        <div class="items-list" id="emb-list"><div style="font-size:12px;color:var(--hint);padding:4px 0">Nenhum material adicionado ainda.</div></div>
+        <div class="add-row">
+          <div>
+            <label>Material</label>
+            <select id="emb-item">
+              <option value="">Selecione...</option>
+              <option>Sacola PP — CAIXA C/300</option><option>Sacola P — CAIXA C/200</option>
+              <option>Sacola M — CAIXA C/200</option><option>Sacola G — CAIXA C/100</option>
+              <option>Papel de Seda — PACOTE C/200</option>
+              <option>Etiqueta Vermelha (preço) — ROLO</option>
+              <option>Etiqueta Branca (preço) — ROLO</option>
+              <option>Ribbon (tinta impressora) — UND</option>
+              <option>Lamina Olfativa — CAIXA C/3000</option>
+              <option>Etiqueta de Prove — PACOTE</option>
+            </select>
+          </div>
+          <div><label>Qtd</label><input type="number" id="emb-qtd" min="1" value="1"></div>
+          <div><label style="visibility:hidden">x</label><button class="btn-add" onclick="addEmb()">+ Add</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="submit-wrap">
+      <button class="btn-submit" id="btn-submit" onclick="submitForm()">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Enviar solicitação
+      </button>
+    </div>
+  </div>
+
+  <div class="success" id="success-area">
+    <div class="check-circle"><svg width="28" height="28" fill="none" stroke="#1D9E75" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+    <h2>Solicitação enviada!</h2>
+    <p>Sua solicitação foi registrada com sucesso.<br>O setor de demanda irá analisar e responder em breve.</p>
+    <button class="btn-novo" onclick="novaForm()">Fazer nova solicitação</button>
+  </div>
+</div>
+
+<script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyGskfmdceePoP2xuCtojnQWx6JDFB9NnHLzCrwK8JxnECeOG2-emaNVcDgohidGjXi/exec';
+let SKU_MAP = {};
+let provItems = [], embItems = [];
+
+// Load SKUs from external file
+async function loadSKUs() {
+  const bar = document.getElementById('progress-bar');
+  bar.style.width = '30%';
+  try {
+    const resp = await fetch('skus.json');
+    bar.style.width = '80%';
+    SKU_MAP = await resp.json();
+    bar.style.width = '100%';
+    setTimeout(() => {
+      document.getElementById('loading-screen').classList.add('hidden');
+    }, 300);
+  } catch(e) {
+    document.getElementById('loading-screen').innerHTML = '<div style="text-align:center;padding:2rem"><p>Erro ao carregar catálogo. Recarregue a página.</p></div>';
+  }
+}
+
+function previewProv() {
+  const code = document.getElementById('prov-sku').value.trim();
+  const hint = document.getElementById('prov-hint');
+  if (!code) { hint.className = 'sku-hint'; return; }
+  const nome = SKU_MAP[code];
+  if (nome) { hint.textContent = '✓ ' + nome; hint.className = 'sku-hint show'; }
+  else { hint.textContent = 'Código não encontrado no catálogo'; hint.className = 'sku-hint show error'; }
+}
+
+function addProv() {
+  const code = document.getElementById('prov-sku').value.trim();
+  const qtd = parseInt(document.getElementById('prov-qtd').value) || 1;
+  if (!code) { alert('Digite o código do produto.'); return; }
+  const nome = SKU_MAP[code] || 'Produto não cadastrado';
+  provItems.push({ codigo: code, nome, qtd });
+  document.getElementById('prov-sku').value = '';
+  document.getElementById('prov-qtd').value = '1';
+  document.getElementById('prov-hint').className = 'sku-hint';
+  renderProv();
+}
+
+function removeProv(i) { provItems.splice(i, 1); renderProv(); }
+function renderProv() {
+  const el = document.getElementById('prov-list');
+  if (!provItems.length) { el.innerHTML = '<div style="font-size:12px;color:var(--hint);padding:4px 0">Nenhum produto adicionado ainda.</div>'; return; }
+  el.innerHTML = provItems.map((p, i) => `<div class="item-row">
+    <div><div class="item-name">${p.nome}</div><div class="item-sub">SKU ${p.codigo}</div></div>
+    <input type="number" min="1" value="${p.qtd}" onchange="provItems[${i}].qtd=parseInt(this.value)||1" style="width:72px">
+    <button class="rm" onclick="removeProv(${i})">×</button>
+  </div>`).join('');
+}
+
+function addEmb() {
+  const item = document.getElementById('emb-item').value;
+  const qtd = parseInt(document.getElementById('emb-qtd').value) || 1;
+  if (!item) { alert('Selecione um material.'); return; }
+  embItems.push({ item, qtd });
+  document.getElementById('emb-item').value = '';
+  document.getElementById('emb-qtd').value = '1';
+  renderEmb();
+}
+
+function removeEmb(i) { embItems.splice(i, 1); renderEmb(); }
+function renderEmb() {
+  const el = document.getElementById('emb-list');
+  if (!embItems.length) { el.innerHTML = '<div style="font-size:12px;color:var(--hint);padding:4px 0">Nenhum material adicionado ainda.</div>'; return; }
+  el.innerHTML = embItems.map((e, i) => `<div class="item-row">
+    <div class="item-name">${e.item}</div>
+    <input type="number" min="1" value="${e.qtd}" onchange="embItems[${i}].qtd=parseInt(this.value)||1" style="width:72px">
+    <button class="rm" onclick="removeEmb(${i})">×</button>
+  </div>`).join('');
+}
+
+async function submitForm() {
+  const loja = document.getElementById('f-loja').value;
+  const gerente = document.getElementById('f-gerente').value.trim();
+  const obs = document.getElementById('f-obs').value.trim();
+  if (!loja || !gerente) { alert('Preencha a loja e o seu nome.'); return; }
+  if (!provItems.length && !embItems.length) { alert('Adicione ao menos um item.'); return; }
+
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="btn-spinner"></span> Enviando...';
+
+  const solicitacao = {
+    id: 'SOL-' + Date.now(),
+    loja, gerente, obs,
+    provadores: JSON.parse(JSON.stringify(provItems)),
+    embalagens: JSON.parse(JSON.stringify(embItems)),
+    data: new Date().toISOString(),
+    status: 'Pendente'
+  };
+
+  try {
+    const resp = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'WRITE', data: solicitacao })
+    });
+    await resp.json();
+    document.getElementById('form-area').style.display = 'none';
+    document.getElementById('success-area').style.display = 'block';
+  } catch(e) {
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Enviar solicitação';
+    alert('Erro ao enviar: ' + e.message);
+  }
+}
+
+function novaForm() {
+  provItems = []; embItems = []; renderProv(); renderEmb();
+  ['f-loja','f-gerente','f-obs'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('form-area').style.display = 'block';
+  document.getElementById('success-area').style.display = 'none';
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Enviar solicitação';
+}
+
+loadSKUs();
+</script>
+</body>
+</html>
