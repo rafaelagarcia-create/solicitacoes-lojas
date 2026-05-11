@@ -33,7 +33,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14
 .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.75rem;flex-wrap:wrap;gap:10px}
 .topbar h1{font-size:20px;font-weight:600}
 .page{display:none}.page.active{display:block}
-.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.75rem}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1.75rem}
 .metric-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem}
 .metric-label{font-size:11px;color:var(--hint);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px}
 .metric-value{font-size:26px;font-weight:600;font-family:var(--mono)}
@@ -128,7 +128,7 @@ tbody tr:hover td{background:#FAFAF8}
       <div class="metric-card accent-blue"><div class="metric-label">Total</div><div class="metric-value" id="m-total">—</div><div class="metric-sub">solicitações</div></div>
       <div class="metric-card accent-amber"><div class="metric-label">Pendentes</div><div class="metric-value" id="m-pend">—</div><div class="metric-sub">aguardando</div></div>
       <div class="metric-card accent-green"><div class="metric-label">Concluídas</div><div class="metric-value" id="m-conc">—</div><div class="metric-sub">finalizadas</div></div>
-      <div class="metric-card accent-red"><div class="metric-label">Alertas</div><div class="metric-value" id="m-alert">—</div><div class="metric-sub">atenção</div></div>
+      
     </div>
     <div class="toolbar">
       <select id="f-loja" onchange="renderTable()">
@@ -162,7 +162,7 @@ tbody tr:hover td{background:#FAFAF8}
       <div class="metric-card accent-blue"><div class="metric-label">Total geral</div><div class="metric-value" id="r-total">0</div></div>
       <div class="metric-card accent-amber"><div class="metric-label">Pendentes</div><div class="metric-value" id="r-pend">0</div></div>
       <div class="metric-card accent-green"><div class="metric-label">Concluídas</div><div class="metric-value" id="r-conc">0</div></div>
-      <div class="metric-card accent-red"><div class="metric-label">Alertas</div><div class="metric-value" id="r-alert">0</div></div>
+      
     </div>
     <div class="resumo-grid">
       <div class="resumo-card"><h4>Por loja</h4><div id="chart-loja"></div></div>
@@ -251,7 +251,6 @@ function renderTable() {
   document.getElementById('m-total').textContent = allData.length;
   document.getElementById('m-pend').textContent = allData.filter(function(s){ return s.status === 'Pendente'; }).length;
   document.getElementById('m-conc').textContent = allData.filter(function(s){ return s.status === 'Concluído'; }).length;
-  document.getElementById('m-alert').textContent = allData.filter(function(s){ return s.status === 'Alerta' || s.status === 'Crítico'; }).length;
 
   var tb = document.getElementById('tbody-sol');
   if (!rows.length) {
@@ -343,6 +342,25 @@ async function saveEdit() {
   btn.innerHTML = 'Salvar alterações';
 }
 
+
+async function deleteItem(id) {
+  if (!confirm('Tem certeza que deseja excluir esta solicitação?')) return;
+  try {
+    var resp = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'DELETE', id: id })
+    });
+    await resp.json();
+    allData = allData.filter(function(s){ return String(s.id) !== String(id); });
+    document.getElementById('footer-count').textContent = allData.length;
+    renderTable();
+    renderResumo();
+    showToast('Solicitação excluída!');
+  } catch(e) {
+    showToast('Erro ao excluir: ' + e.message);
+  }
+}
+
 function closeModal() { document.getElementById('modal-det').classList.remove('open'); }
 document.getElementById('modal-det').addEventListener('click', function(e) {
   if (e.target === document.getElementById('modal-det')) closeModal();
@@ -352,7 +370,6 @@ function renderResumo() {
   document.getElementById('r-total').textContent = allData.length;
   document.getElementById('r-pend').textContent = allData.filter(function(s){ return s.status === 'Pendente'; }).length;
   document.getElementById('r-conc').textContent = allData.filter(function(s){ return s.status === 'Concluído'; }).length;
-  document.getElementById('r-alert').textContent = allData.filter(function(s){ return s.status === 'Alerta' || s.status === 'Crítico'; }).length;
 
   var maxL = Math.max.apply(null, LOJAS.map(function(l){ return allData.filter(function(s){ return s.loja === l; }).length; }).concat([1]));
   document.getElementById('chart-loja').innerHTML = LOJAS.map(function(l) {
