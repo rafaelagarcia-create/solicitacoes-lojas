@@ -273,7 +273,7 @@ function renderTable() {
       '<td>' + (tags || '—') + '</td>' +
       '<td style="color:var(--muted);font-size:12px">' + dt + '</td>' +
       '<td><span class="badge ' + cls + '">' + s.status + '</span></td>' +
-      '<td><button class="btn btn-sm btn-primary" onclick="openDetail(\'' + sid + '\')">Ver / Editar</button></td>' +
+      '<td style="display:flex;gap:6px">' + '<button class="btn btn-sm btn-primary" onclick="openDetail(\'' + sid + '\')">Ver / Editar</button>' + '<button class="btn btn-sm" style="color:#E24B4A;border-color:rgba(226,75,74,0.3)" onclick="deleteItem(\'' + sid + '\')" title="Excluir">&#128465;</button>' + '</td>' +
     '</tr>';
   }).join('');
 }
