@@ -903,7 +903,7 @@ async function loadData() {
     var resp = await fetch(SCRIPT_URL + '?action=READ');
     var data = await resp.json();
     allData = Array.isArray(data) ? data : [];
-    document.getElementById('footer-count').textContent = allData.length;
+    var __el=document.getElementById('footer-count'); if(__el) __el.textContent = allData.length;
     renderTable();
     renderResumo();
     showToast('Dados atualizados!');
@@ -926,11 +926,11 @@ function renderTable() {
     return true;
   }).sort(function(a,b){ return new Date(b.data) - new Date(a.data); });
 
-  document.getElementById('tbl-count').textContent = rows.length + ' registro(s)';
-  document.getElementById('m-total').textContent = allData.length;
+  var __el=document.getElementById('tbl-count'); if(__el) __el.textContent = rows.length + ' registro(s)';
+  var __el=document.getElementById('m-total'); if(__el) __el.textContent = allData.length;
   var nb = document.getElementById('nav-badge'); if(nb) nb.textContent = allData.filter(function(s){return s.status==='Pendente';}).length;
-  document.getElementById('m-pend').textContent = allData.filter(function(s){ return s.status === 'Pendente'; }).length;
-  document.getElementById('m-conc').textContent = allData.filter(function(s){ return s.status === 'Concluído'; }).length;
+  var __el=document.getElementById('m-pend'); if(__el) __el.textContent = allData.filter(function(s){ return s.status === 'Pendente'; }).length;
+  var __el=document.getElementById('m-conc'); if(__el) __el.textContent = allData.filter(function(s){ return s.status === 'Concluído'; }).length;
 
   var tb = document.getElementById('tbody-sol');
   if (!rows.length) {
@@ -965,7 +965,7 @@ function openDetail(id) {
   }
   if (!s) return;
   currentId = id;
-  document.getElementById('modal-title').textContent = 'Solicitação ' + s.id;
+  var __el=document.getElementById('modal-title'); if(__el) __el.textContent = 'Solicitação ' + s.id;
   document.getElementById('modal-info').innerHTML =
     '<div class="info-item"><div class="info-item-label">Loja</div><div class="info-item-value">' + s.loja + '</div></div>' +
     '<div class="info-item"><div class="info-item-label">Gerente</div><div class="info-item-value">' + s.gerente + '</div></div>' +
@@ -986,7 +986,7 @@ function openDetail(id) {
     '</div>';
   } else { me.innerHTML = ''; }
 
-  document.getElementById('modal-obs').textContent = s.obs || '(nenhuma)';
+  var __el=document.getElementById('modal-obs'); if(__el) __el.textContent = s.obs || '(nenhuma)';
   document.getElementById('edit-status').value = s.status || 'Pendente';
   document.getElementById('edit-resposta').value = s.resposta || '';
   document.getElementById('modal-det').classList.add('open');
@@ -1032,7 +1032,7 @@ async function deleteItem(id) {
     });
     await resp.json();
     allData = allData.filter(function(s){ return String(s.id) !== String(id); });
-    document.getElementById('footer-count').textContent = allData.length;
+    var __el=document.getElementById('footer-count'); if(__el) __el.textContent = allData.length;
     renderTable();
     renderResumo();
     showToast('Solicitação excluída!');
@@ -1047,9 +1047,9 @@ document.getElementById('modal-det').addEventListener('click', function(e) {
 });
 
 function renderResumo() {
-  document.getElementById('r-total').textContent = allData.length;
-  document.getElementById('r-pend').textContent = allData.filter(function(s){ return s.status === 'Pendente'; }).length;
-  document.getElementById('r-conc').textContent = allData.filter(function(s){ return s.status === 'Concluído'; }).length;
+  var __el=document.getElementById('r-total'); if(__el) __el.textContent = allData.length;
+  var __el=document.getElementById('r-pend'); if(__el) __el.textContent = allData.filter(function(s){ return s.status === 'Pendente'; }).length;
+  var __el=document.getElementById('r-conc'); if(__el) __el.textContent = allData.filter(function(s){ return s.status === 'Concluído'; }).length;
 
   var maxL = Math.max.apply(null, LOJAS.map(function(l){ return allData.filter(function(s){ return s.loja === l; }).length; }).concat([1]));
   document.getElementById('chart-loja').innerHTML = LOJAS.map(function(l) {
