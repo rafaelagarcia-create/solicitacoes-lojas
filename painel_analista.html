@@ -1082,13 +1082,13 @@ function navigate(page, btn) {
 
 function showToast(msg) {
   var t = document.getElementById('toast');
-  document.getElementById('toast-msg').textContent = msg;
+  var tm = document.getElementById('toast-msg'); if(tm) tm.textContent = msg; else t.textContent = msg;
   t.classList.add('show');
   setTimeout(function(){ t.classList.remove('show'); }, 2500);
 }
 
 
-document.getElementById('topbar-date').textContent = new Date().toLocaleDateString('pt-BR', {weekday:'short', day:'2-digit', month:'short'});
+var td2=document.getElementById('topbar-date'); if(td2) td2.textContent = new Date().toLocaleDateString('pt-BR', {weekday:'short', day:'2-digit', month:'short'});
 
 loadData();
 
