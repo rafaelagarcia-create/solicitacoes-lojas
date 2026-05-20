@@ -1336,26 +1336,33 @@ function removeEmbItem(solId, idx) {
 }
 
 function renderProvItem(solId,p,i){
-  var btn = document.createElement('button');
-  btn.innerHTML = '&#x2715;';
-  btn.setAttribute('onclick','removeProvItem("'+solId+'",'+i+')');
-  btn.style.cssText = 'background:none;border:none;cursor:pointer;color:var(--text-3);padding:4px 6px;border-radius:6px;font-size:16px;line-height:1';
-  var d = '<div class="detail-item" style="gap:8px">';
-  d += '<div style="flex:1"><div style="font-weight:500">'+p.nome+'</div>';
-  d += '<span class="sku-tag">SKU '+p.codigo+'</span></div>';
-  d += '<span class="qty-tag">Qtd '+p.qtd+'</span>';
-  d += '<button onclick='removeProvItem("'+solId+'",'+i+')' style="background:none;border:none;cursor:pointer;color:var(--text-3);padding:4px 6px;border-radius:6px;font-size:16px" onmouseover="this.style.color='#EF4444'" onmouseout="this.style.color=''">&#x2715;</button>';
-  d += '</div>';
-  return d;
+  var d = document.createElement("div");
+  d.className = "detail-item";
+  d.style.gap = "8px";
+  d.innerHTML = "<div style='flex:1'><div style='font-weight:500'>" + p.nome + "</div><span class='sku-tag'>SKU " + p.codigo + "</span></div><span class='qty-tag'>Qtd " + p.qtd + "</span>";
+  var btn = document.createElement("button");
+  btn.innerHTML = "&#x2715;";
+  btn.style.cssText = "background:none;border:none;cursor:pointer;color:var(--text-3);padding:4px 6px;border-radius:6px;font-size:16px";
+  btn.addEventListener("mouseover", function(){ btn.style.color="#EF4444"; });
+  btn.addEventListener("mouseout", function(){ btn.style.color=""; });
+  btn.addEventListener("click", function(){ removeProvItem(solId, i); });
+  d.appendChild(btn);
+  return d.outerHTML;
 }
 
 function renderEmbItem(solId,e,i){
-  var d = '<div class="detail-item" style="gap:8px">';
-  d += '<span style="flex:1">'+e.item+'</span>';
-  d += '<span class="qty-tag">Qtd '+e.qtd+'</span>';
-  d += '<button onclick='removeEmbItem("'+solId+'",'+i+')' style="background:none;border:none;cursor:pointer;color:var(--text-3);padding:4px 6px;border-radius:6px;font-size:16px" onmouseover="this.style.color='#EF4444'" onmouseout="this.style.color=''">&#x2715;</button>';
-  d += '</div>';
-  return d;
+  var d = document.createElement("div");
+  d.className = "detail-item";
+  d.style.gap = "8px";
+  d.innerHTML = "<span style='flex:1'>" + e.item + "</span><span class='qty-tag'>Qtd " + e.qtd + "</span>";
+  var btn = document.createElement("button");
+  btn.innerHTML = "&#x2715;";
+  btn.style.cssText = "background:none;border:none;cursor:pointer;color:var(--text-3);padding:4px 6px;border-radius:6px;font-size:16px";
+  btn.addEventListener("mouseover", function(){ btn.style.color="#EF4444"; });
+  btn.addEventListener("mouseout", function(){ btn.style.color=""; });
+  btn.addEventListener("click", function(){ removeEmbItem(solId, i); });
+  d.appendChild(btn);
+  return d.outerHTML;
 }
 
 // Upload zone click
