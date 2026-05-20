@@ -960,7 +960,7 @@ async function loadData() {
     var resp = await fetch(SCRIPT_URL + '?action=READ');
     var data = await resp.json();
     allData = Array.isArray(data) ? data : [];
-    document.getElementById('footer-count').textContent = allData.length;
+    var __efootercount=document.getElementById('footer-count'); if(__efootercount) __efootercount.textContent = allData.length;
     renderTable();
     renderResumo();
     showToast('Dados atualizados!');
@@ -983,11 +983,11 @@ function renderTable() {
     return true;
   }).sort(function(a,b){ return new Date(b.data) - new Date(a.data); });
 
-  document.getElementById('tbl-count').textContent = rows.length + ' registro(s)';
-  document.getElementById('m-total').textContent = allData.length;
+  var __etblcount=document.getElementById('tbl-count'); if(__etblcount) __etblcount.textContent = rows.length + ' registro(s)';
+  var __emtotal=document.getElementById('m-total'); if(__emtotal) __emtotal.textContent = allData.length;
   var nb = document.getElementById('nav-badge'); if(nb) nb.textContent = allData.filter(function(s){return s.status==='Pendente';}).length;
-  document.getElementById('m-pend').textContent = allData.filter(function(s){ return s.status === 'Pendente'; }).length;
-  document.getElementById('m-conc').textContent = allData.filter(function(s){ return s.status === 'Concluído'; }).length;
+  var __empend=document.getElementById('m-pend'); if(__empend) __empend.textContent = allData.filter(function(s){ return s.status === 'Pendente'; }).length;
+  var __emconc=document.getElementById('m-conc'); if(__emconc) __emconc.textContent = allData.filter(function(s){ return s.status === 'Concluído'; }).length;
 
   var tb = document.getElementById('tbody-sol');
   if (!rows.length) {
@@ -1022,8 +1022,8 @@ function openDetail(id) {
   }
   if (!s) return;
   currentId = id;
-  document.getElementById('modal-title').textContent = 'Solicitação ' + s.id;
-  document.getElementById('modal-info').innerHTML =
+  var __emodaltitle=document.getElementById('modal-title'); if(__emodaltitle) __emodaltitle.textContent = 'Solicitação ' + s.id;
+  var __emodalinfo=document.getElementById('modal-info'); if(__emodalinfo) __emodalinfo.innerHTML =
     '<div class="info-item"><div class="info-item-label">Loja</div><div class="info-item-value">' + s.loja + '</div></div>' +
     '<div class="info-item"><div class="info-item-label">Gerente</div><div class="info-item-value">' + s.gerente + '</div></div>' +
     '<div class="info-item"><div class="info-item-label">Data</div><div class="info-item-value">' + new Date(s.data).toLocaleString('pt-BR') + '</div></div>' +
@@ -1043,7 +1043,7 @@ function openDetail(id) {
     '</div>';
   } else { me.innerHTML = ''; }
 
-  document.getElementById('modal-obs').textContent = s.obs || '(nenhuma)';
+  var __emodalobs=document.getElementById('modal-obs'); if(__emodalobs) __emodalobs.textContent = s.obs || '(nenhuma)';
   document.getElementById('edit-status').value = s.status || 'Pendente';
   document.getElementById('edit-resposta').value = s.resposta || '';
   document.getElementById('modal-det').classList.add('open');
@@ -1089,7 +1089,7 @@ async function deleteItem(id) {
     });
     await resp.json();
     allData = allData.filter(function(s){ return String(s.id) !== String(id); });
-    document.getElementById('footer-count').textContent = allData.length;
+    var __efootercount=document.getElementById('footer-count'); if(__efootercount) __efootercount.textContent = allData.length;
     renderTable();
     renderResumo();
     showToast('Solicitação excluída!');
@@ -1104,12 +1104,12 @@ document.getElementById('modal-det').addEventListener('click', function(e) {
 });
 
 function renderResumo() {
-  document.getElementById('r-total').textContent = allData.length;
-  document.getElementById('r-pend').textContent = allData.filter(function(s){ return s.status === 'Pendente'; }).length;
-  document.getElementById('r-conc').textContent = allData.filter(function(s){ return s.status === 'Concluído'; }).length;
+  var __ertotal=document.getElementById('r-total'); if(__ertotal) __ertotal.textContent = allData.length;
+  var __erpend=document.getElementById('r-pend'); if(__erpend) __erpend.textContent = allData.filter(function(s){ return s.status === 'Pendente'; }).length;
+  var __erconc=document.getElementById('r-conc'); if(__erconc) __erconc.textContent = allData.filter(function(s){ return s.status === 'Concluído'; }).length;
 
   var maxL = Math.max.apply(null, LOJAS.map(function(l){ return allData.filter(function(s){ return s.loja === l; }).length; }).concat([1]));
-  document.getElementById('chart-loja').innerHTML = LOJAS.map(function(l) {
+  var __echartloja=document.getElementById('chart-loja'); if(__echartloja) __echartloja.innerHTML = LOJAS.map(function(l) {
     var n = allData.filter(function(s){ return s.loja === l; }).length;
     return bar(l.split(' - ').pop(), n, Math.round(n/maxL*100), 'var(--green)');
   }).join('');
@@ -1117,7 +1117,7 @@ function renderResumo() {
   var sts = ['Pendente','Em andamento','Alerta','Crítico','Concluído'];
   var sc = {'Pendente':'var(--purple)','Em andamento':'var(--blue)','Alerta':'var(--amber)','Crítico':'var(--red)','Concluído':'var(--green)'};
   var maxS = Math.max.apply(null, sts.map(function(s){ return allData.filter(function(x){ return x.status === s; }).length; }).concat([1]));
-  document.getElementById('chart-status').innerHTML = sts.map(function(s) {
+  var __echartstatus=document.getElementById('chart-status'); if(__echartstatus) __echartstatus.innerHTML = sts.map(function(s) {
     var n = allData.filter(function(x){ return x.status === s; }).length;
     return bar(s, n, Math.round(n/maxS*100), sc[s]);
   }).join('');
@@ -1140,13 +1140,13 @@ function navigate(page, btn) {
 
 function showToast(msg) {
   var t = document.getElementById('toast');
-  document.getElementById('toast-msg').textContent = msg;
+  var __etoastmsg=document.getElementById('toast-msg'); if(__etoastmsg) __etoastmsg.textContent = msg;
   t.classList.add('show');
   setTimeout(function(){ t.classList.remove('show'); }, 2500);
 }
 
 
-document.getElementById('topbar-date').textContent = new Date().toLocaleDateString('pt-BR', {weekday:'short', day:'2-digit', month:'short'});
+var __etopbardate=document.getElementById('topbar-date'); if(__etopbardate) __etopbardate.textContent = new Date().toLocaleDateString('pt-BR', {weekday:'short', day:'2-digit', month:'short'});
 
 loadData();
 
