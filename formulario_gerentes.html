@@ -95,6 +95,21 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .btn-confirmar{flex:1;font-family:var(--font);font-size:13px;font-weight:500;padding:10px;border-radius:10px;border:none;background:linear-gradient(135deg,#3B82F6,#2563EB);color:#fff;cursor:pointer}
 .btn-confirmar:hover{background:#d48a1a}
 
+
+.inline-alert {
+  display: none;
+  background: var(--amber-light);
+  border: 1px solid rgba(245,158,11,0.3);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--amber-dark);
+  margin-bottom: 10px;
+  font-weight: 500;
+  animation: fadeIn 0.2s ease;
+}
+.inline-alert.show { display: block; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(-4px)} to{opacity:1;transform:translateY(0)} }
 .loading-screen{position:fixed;inset:0;background:linear-gradient(135deg,#0A0F1E,#111827);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;z-index:999;transition:opacity 0.4s}
 .loading-screen.hidden{opacity:0;pointer-events:none}
 .loading-screen h2{font-size:18px;font-weight:600;margin-top:1rem}
@@ -188,6 +203,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
         <div><h2>Provadores</h2><p>Produtos que precisam de demonstrador</p></div>
       </div>
       <div class="card-body">
+        <div class="inline-alert" id="alert-prov"></div>
         <div class="items-list" id="prov-list"><div style="font-size:12px;color:var(--hint);padding:4px 0">Nenhum produto adicionado ainda.</div></div>
         <div class="add-row">
           <div>
@@ -209,6 +225,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
         <div><h2>Embalagens (Antilhas)</h2><p>Materiais necessários</p></div>
       </div>
       <div class="card-body">
+        <div class="inline-alert" id="alert-emb"></div>
         <div class="items-list" id="emb-list"><div style="font-size:12px;color:var(--hint);padding:4px 0">Nenhum material adicionado ainda.</div></div>
         <div class="add-row">
           <div>
@@ -367,6 +384,13 @@ function tryAddProv() {
   if (!code) { alert('Digite o código do produto.'); return; }
   var nome = SKU_MAP[code] || 'Produto não cadastrado';
 
+  // Check duplicate in CURRENT list
+  var dupAtual = provItems.find(function(p){ return String(p.codigo) === String(code); });
+  if (dupAtual) {
+    showInlineAlert('prov', '⚠️ Atenção: o produto "' + nome + '" (SKU ' + code + ') já está nesta solicitação. Verifique antes de adicionar novamente.');
+    return;
+  }
+
   if (document.getElementById('f-loja').value && checkDupProv(code, nome)) {
     dupPendingType = 'prov';
     dupPendingData = { codigo: code, nome: nome, qtd: qtd };
@@ -382,6 +406,13 @@ function tryAddEmb() {
   var item = document.getElementById('emb-item').value;
   var qtd = parseInt(document.getElementById('emb-qtd').value) || 1;
   if (!item) { alert('Selecione um material.'); return; }
+
+  // Check duplicate in CURRENT list
+  var dupAtual = embItems.find(function(e){ return e.item === item; });
+  if (dupAtual) {
+    showInlineAlert('emb', '⚠️ Atenção: "' + item + '" já está nesta solicitação. Verifique antes de adicionar novamente.');
+    return;
+  }
 
   if (document.getElementById('f-loja').value && checkDupEmb(item)) {
     dupPendingType = 'emb';
@@ -427,6 +458,16 @@ function doAddEmb(item, qtd, justificativa) {
 }
 
 // ─── PREVIEW SKU ───
+
+function showInlineAlert(type, msg) {
+  var id = 'alert-' + type;
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(function(){ el.classList.remove('show'); }, 4000);
+}
+
 function previewProv() {
   var code = document.getElementById('prov-sku').value.trim();
   var hint = document.getElementById('prov-hint');
