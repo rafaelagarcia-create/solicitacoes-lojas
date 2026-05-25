@@ -716,6 +716,7 @@ tbody tr:hover td { background: var(--surface2); }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 <div class="layout">
@@ -1194,22 +1195,28 @@ function dragLeave(){ var uz=document.getElementById('upload-zone'); if(uz) uz.c
 function dropFile(e){ e.preventDefault(); dragLeave(); handleFiles(e.dataTransfer.files); }
 
 function handleFiles(files) {
+  if (typeof XLSX === 'undefined') {
+    showToast('Biblioteca de leitura não carregada. Verifique sua conexão.');
+    return;
+  }
   Array.from(files).forEach(function(file){
     if(!file.name.match(/\.xlsx?$/i)){ showToast('Apenas arquivos .xlsx são aceitos.'); return; }
     var reader = new FileReader();
-    reader.onload = function(e){ try { parseExcel(e.target.result, file.name); } catch(err){ showToast('Erro ao ler '+file.name); } };
+    reader.onload = function(e){
+      try {
+        var wb = XLSX.read(e.target.result, {type:'array'});
+        var ws = wb.Sheets[wb.SheetNames[0]];
+        var rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
+        parseExcel(rows, file.name);
+      } catch(err){
+        showToast('Erro ao ler ' + file.name + ': ' + err.message);
+      }
+    };
     reader.readAsArrayBuffer(file);
   });
 }
 
-function parseExcel(buffer, filename) {
-  var bytes = new Uint8Array(buffer);
-  var entries = extractZipEntries(bytes);
-  var sharedStrings = parseSharedStrings(entries['xl/sharedStrings.xml']||'');
-  var sheetXml = '';
-  Object.keys(entries).forEach(function(k){ if(k.match(/xl\/worksheets\/sheet1\.xml/i)) sheetXml=entries[k]; });
-  if(!sheetXml){ showToast('Não foi possível ler: '+filename); return; }
-  var rows = parseSheetXml(sheetXml, sharedStrings);
+function parseExcel(rows, filename) {
   if(!rows||rows.length<2){ showToast('Arquivo sem dados: '+filename); return; }
   var headers = rows[0].map(function(h){ return String(h||'').trim(); });
   var iLoja = headers.findIndex(function(h){ return h.includes('compradora'); });
@@ -1221,53 +1228,17 @@ function parseExcel(buffer, filename) {
   var lojaCode = lojaRaw.split('|')[0].trim();
   var lojaNome = LOJAS_MAP_CODE[lojaCode]||lojaRaw;
   var parsed = rows.slice(1).map(function(row){
-    return { item:String(row[iDesc]||''), qtd:parseFloat(String(row[iQtd]||'0').replace(',','.'))||0, valorUnit:parseFloat(String(row[iVu]||'0').replace(',','.'))||0, valorTotal:parseFloat(String(row[iVal]||'0').replace(',','.'))||0 };
+    var vt = parseFloat(String(row[iVal]||'0').replace(',','.'))||0;
+    var vu = parseFloat(String(row[iVu]||'0').replace(',','.'))||0;
+    var qt = parseFloat(String(row[iQtd]||'0').replace(',','.'))||0;
+    return { item:String(row[iDesc]||''), qtd:qt, valorUnit:vu, valorTotal:vt||vu*qt };
   }).filter(function(r){ return r.item&&r.qtd>0; });
   embData = embData.filter(function(d){ return d.filename!==filename; });
   embData.push({ loja:lojaNome, lojaCode:lojaCode, filename:filename, rows:parsed });
   renderUploadList();
   var bp = document.getElementById('btn-process');
   if(bp) bp.style.display='flex';
-}
-
-function extractZipEntries(bytes) {
-  var entries={}, i=0, dv=new DataView(bytes.buffer);
-  while(i<bytes.length-4){
-    if(dv.getUint32(i,true)===0x04034b50){
-      var fnLen=dv.getUint16(i+26,true), extraLen=dv.getUint16(i+28,true);
-      var compSize=dv.getUint32(i+18,true), method=dv.getUint16(i+8,true);
-      var fn=new TextDecoder('utf-8').decode(bytes.slice(i+30,i+30+fnLen));
-      var dataStart=i+30+fnLen+extraLen;
-      if(method===0&&compSize>0){ try{ entries[fn]=new TextDecoder('utf-8').decode(bytes.slice(dataStart,dataStart+compSize)); }catch(e){} }
-      i=dataStart+compSize;
-    } else { i++; }
-  }
-  return entries;
-}
-
-function parseSharedStrings(xml){
-  var strings=[], re=/<si[^>]*>.*?<\/si>/gs, m;
-  while((m=re.exec(xml))!==null){
-    var text='', ts=m[0].match(/<t[^>]*>([^<]*)<\/t>/g)||[];
-    ts.forEach(function(t){ text+=t.replace(/<[^>]+>/g,''); });
-    strings.push(text.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>'));
-  }
-  return strings;
-}
-
-function parseSheetXml(xml, ss){
-  var rows=[], rRe=/<row[^>]*>(.*?)<\/row>/gs, rm;
-  while((rm=rRe.exec(xml))!==null){
-    var cells=[], cRe=/<c[^>]*r="([A-Z]+)\d+"[^>]*(?:t="([^"]*)")?[^>]*>(?:<v>([^<]*)<\/v>)?/g, cm;
-    while((cm=cRe.exec(rm[1]))!==null){
-      var col=cm[1], type=cm[2]||'', val=cm[3]||'';
-      var ci=col.split('').reduce(function(a,c){ return a*26+c.charCodeAt(0)-64; },0)-1;
-      while(cells.length<=ci) cells.push('');
-      cells[ci]=(type==='s')?(ss[parseInt(val)]||''):val;
-    }
-    if(cells.some(function(c){ return c!==''; })) rows.push(cells);
-  }
-  return rows;
+  showToast('Arquivo carregado: ' + filename);
 }
 
 function renderUploadList(){
