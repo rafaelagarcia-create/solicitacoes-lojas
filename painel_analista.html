@@ -686,6 +686,43 @@ tbody tr:hover td { background: var(--surface2); }
 .toast-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; }
 
 
+
+
+.sku-search-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:1.5rem; margin-bottom:1rem; }
+.sku-search-title { font-size:14px; font-weight:600; color:var(--text); margin-bottom:4px; }
+.sku-search-sub { font-size:11px; color:var(--text-3); margin-bottom:1.25rem; font-family:var(--mono); }
+.sku-search-row { display:flex; gap:10px; align-items:center; margin-bottom:1.25rem; }
+.sku-search-input { flex:1; font-family:var(--font); font-size:14px; padding:10px 14px; border:1px solid var(--border); border-radius:var(--radius); background:var(--surface2); color:var(--text); outline:none; transition:border-color 0.15s; }
+.sku-search-input:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(59,130,246,0.1); }
+.sku-result-name { font-size:14px; font-weight:600; color:var(--text); padding:10px 14px; background:var(--blue-dim); border:1px solid var(--blue-border); border-radius:var(--radius); margin-bottom:1rem; display:none; }
+.sku-result-name.show { display:block; }
+.sku-history { display:flex; flex-direction:column; gap:8px; }
+.sku-history-item { display:grid; grid-template-columns:auto 1fr auto auto; gap:12px; align-items:center; background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); padding:10px 14px; font-size:13px; }
+.sku-history-date { font-family:var(--mono); font-size:11px; color:var(--text-3); white-space:nowrap; }
+.sku-history-loja { }
+.sku-history-gerente { color:var(--text-2); font-size:12px; }
+.sku-empty { text-align:center; padding:2rem; color:var(--text-3); font-size:13px; }
+
+.metrics-toolbar {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 1.5rem; flex-wrap: wrap;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 1rem 1.25rem;
+}
+.metrics-toolbar-label {
+  font-family: var(--mono); font-size: 11px;
+  color: var(--text-3); text-transform: uppercase;
+  letter-spacing: 0.08em; margin-right: 4px;
+}
+.filter-active-badge {
+  font-family: var(--mono); font-size: 11px;
+  background: var(--blue-dim); color: var(--blue);
+  border: 1px solid var(--blue-border);
+  padding: 3px 10px; border-radius: 20px;
+  display: none;
+}
+.filter-active-badge.show { display: inline-block; }
+
 .upload-zone{border:2px dashed var(--border2);border-radius:var(--radius-lg);padding:2rem;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--surface2);margin-bottom:1.5rem}
 .upload-zone:hover,.upload-zone.drag{border-color:var(--blue);background:var(--blue-dim)}
 .upload-zone input{display:none}
@@ -874,9 +911,53 @@ tbody tr:hover td { background: var(--surface2); }
   </div>
 
   <div class="page" id="page-metricas">
+    <div class="metrics-toolbar">
+      <span class="metrics-toolbar-label">Filtrar por</span>
+      <select id="filter-mes" onchange="applyMetricsFilter()" style="width:160px">
+        <option value="">Todos os meses</option>
+        <option value="1">Janeiro</option>
+        <option value="2">Fevereiro</option>
+        <option value="3">Março</option>
+        <option value="4">Abril</option>
+        <option value="5">Maio</option>
+        <option value="6">Junho</option>
+        <option value="7">Julho</option>
+        <option value="8">Agosto</option>
+        <option value="9">Setembro</option>
+        <option value="10">Outubro</option>
+        <option value="11">Novembro</option>
+        <option value="12">Dezembro</option>
+      </select>
+      <select id="filter-ano" onchange="applyMetricsFilter()" style="width:120px">
+        <option value="">Todos os anos</option>
+        <option value="2025">2025</option>
+        <option value="2026">2026</option>
+        <option value="2027">2027</option>
+      </select>
+      <span class="filter-active-badge" id="filter-badge">Filtro ativo</span>
+      <button class="btn btn-sm" onclick="clearMetricsFilter()" id="btn-clear-filter" style="display:none">
+        × Limpar filtro
+      </button>
+    </div>
+
+    <div class="sku-search-card">
+      <div class="sku-search-title">🔍 Buscar histórico de provador</div>
+      <div class="sku-search-sub">Digite o código SKU para ver quando e por qual loja foi solicitado</div>
+      <div class="sku-search-row">
+        <input type="text" class="sku-search-input" id="sku-search-input" placeholder="Ex: 48130" oninput="searchSKU()">
+        <button class="btn btn-primary" onclick="searchSKU()">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Buscar
+        </button>
+        <button class="btn btn-sm" onclick="clearSKUSearch()" id="btn-clear-sku" style="display:none">× Limpar</button>
+      </div>
+      <div class="sku-result-name" id="sku-result-name"></div>
+      <div class="sku-history" id="sku-history"></div>
+    </div>
+
     <div class="chart-card">
       <div class="chart-card-title">💰 Custo de provadores por loja</div>
-      <div class="chart-card-sub">Calculado com base nas solicitações + tabela de custos</div>
+      <div class="chart-card-sub" id="chart-custo-sub">Calculado com base nas solicitações + tabela de custos</div>
       <div id="chart-custo-prov"></div>
       <div style="margin-top:1rem;display:grid;grid-template-columns:repeat(3,1fr);gap:8px" id="totais-prov"></div>
     </div>
@@ -1160,9 +1241,122 @@ var LOJAS_MAP_CODE = {'7891':'7891 - Shopping','5188':'5188 - Assaí','14441':'1
 var LOJA_COLORS = ['#3B82F6','#10B981','#F59E0B','#8B5CF6','#22D3EE','#EF4444'];
 var embData = [];
 
+
+
+// ── SKU SEARCH ──
+function searchSKU() {
+  var code = document.getElementById('sku-search-input').value.trim();
+  var nameEl = document.getElementById('sku-result-name');
+  var histEl = document.getElementById('sku-history');
+  var btnClear = document.getElementById('btn-clear-sku');
+  if(!code) { if(nameEl) nameEl.classList.remove('show'); if(histEl) histEl.innerHTML=''; if(btnClear) btnClear.style.display='none'; return; }
+
+  // Find SKU name
+  var nome = CUSTO_MAP[code] !== undefined ? (window.SKU_NAMES && window.SKU_NAMES[code] ? window.SKU_NAMES[code] : 'SKU ' + code) : 'SKU ' + code;
+  // Try to get name from allData
+  var found = null;
+  allData.forEach(function(s){
+    if(s.provadores) s.provadores.forEach(function(p){
+      if(String(p.codigo) === String(code)) found = p.nome;
+    });
+  });
+  if(found) nome = found;
+
+  // Find all solicitations containing this SKU
+  var results = [];
+  allData.forEach(function(s){
+    if(s.provadores) s.provadores.forEach(function(p){
+      if(String(p.codigo) === String(code)){
+        results.push({ data: s.data, loja: s.loja, gerente: s.gerente, qtd: p.qtd, status: s.status, id: s.id });
+      }
+    });
+  });
+
+  results.sort(function(a,b){ return new Date(b.data) - new Date(a.data); });
+
+  if(nameEl){
+    nameEl.textContent = '🏷️ ' + nome + ' · ' + results.length + ' ocorrência(s) encontrada(s)';
+    nameEl.classList.add('show');
+  }
+
+  if(btnClear) btnClear.style.display = 'inline-flex';
+
+  var STATUS_COLORS = {'Pendente':'badge-pendente','Em andamento':'badge-em-andamento','Concluído':'badge-concluido','Alerta':'badge-alerta','Crítico':'badge-critico'};
+
+  if(!results.length){
+    if(histEl) histEl.innerHTML = '<div class="sku-empty">Nenhuma solicitação encontrada para o SKU ' + code + '.</div>';
+    return;
+  }
+
+  if(histEl) histEl.innerHTML = results.map(function(r){
+    var dt = new Date(r.data).toLocaleDateString('pt-BR');
+    var cls = STATUS_COLORS[r.status] || 'badge-pendente';
+    return '<div class="sku-history-item">' +
+      '<span class="sku-history-date">' + dt + '</span>' +
+      '<span class="sku-history-loja"><span class="loja-chip">' + r.loja + '</span></span>' +
+      '<span class="sku-history-gerente">' + (r.gerente||'—') + '</span>' +
+      '<span style="display:flex;align-items:center;gap:8px"><span style="font-family:var(--mono);font-size:11px;color:var(--text-2)">Qtd ' + r.qtd + '</span><span class="badge ' + cls + '">' + r.status + '</span></span>' +
+    '</div>';
+  }).join('');
+}
+
+function clearSKUSearch() {
+  var inp = document.getElementById('sku-search-input');
+  var nameEl = document.getElementById('sku-result-name');
+  var histEl = document.getElementById('sku-history');
+  var btnClear = document.getElementById('btn-clear-sku');
+  if(inp) inp.value = '';
+  if(nameEl) nameEl.classList.remove('show');
+  if(histEl) histEl.innerHTML = '';
+  if(btnClear) btnClear.style.display = 'none';
+}
+
+// ── METRICS FILTER ──
+var metricsFilterMes = '';
+var metricsFilterAno = '';
+
+function applyMetricsFilter() {
+  metricsFilterMes = document.getElementById('filter-mes').value;
+  metricsFilterAno = document.getElementById('filter-ano').value;
+  var active = metricsFilterMes || metricsFilterAno;
+  var badge = document.getElementById('filter-badge');
+  var btnClear = document.getElementById('btn-clear-filter');
+  if(badge) badge.classList.toggle('show', !!active);
+  if(btnClear) btnClear.style.display = active ? 'inline-flex' : 'none';
+  if(badge && active) {
+    var meses = ['','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    var label = (metricsFilterMes ? meses[parseInt(metricsFilterMes)] : '') + (metricsFilterMes && metricsFilterAno ? '/' : '') + (metricsFilterAno || '');
+    badge.textContent = '📅 ' + label;
+  }
+  renderCustoProvadores();
+}
+
+function clearMetricsFilter() {
+  metricsFilterMes = '';
+  metricsFilterAno = '';
+  document.getElementById('filter-mes').value = '';
+  document.getElementById('filter-ano').value = '';
+  var badge = document.getElementById('filter-badge');
+  var btnClear = document.getElementById('btn-clear-filter');
+  if(badge) badge.classList.remove('show');
+  if(btnClear) btnClear.style.display = 'none';
+  renderCustoProvadores();
+}
+
+function getFilteredSols() {
+  return allData.filter(function(s) {
+    if(!metricsFilterMes && !metricsFilterAno) return true;
+    var d = new Date(s.data);
+    if(metricsFilterMes && (d.getMonth()+1) !== parseInt(metricsFilterMes)) return false;
+    if(metricsFilterAno && d.getFullYear() !== parseInt(metricsFilterAno)) return false;
+    return true;
+  });
+}
+
 function renderCustoProvadores() {
+  var filteredData = getFilteredSols();
   var resultados = LOJAS_FULL.map(function(loja) {
-    var sols = allData.filter(function(s){ return s.loja === loja; });
+    var sols = filteredData.filter(function(s){ return s.loja === loja; });
     var totalCusto = 0, totalItens = 0;
     sols.forEach(function(s){
       if(s.provadores) s.provadores.forEach(function(p){
@@ -1183,6 +1377,15 @@ function renderCustoProvadores() {
   var totalG = resultados.reduce(function(a,r){ return a+r.custo; },0);
   var totalI = resultados.reduce(function(a,r){ return a+r.itens; },0);
   var top = resultados.slice().sort(function(a,b){ return b.custo-a.custo; })[0];
+  var subEl = document.getElementById('chart-custo-sub');
+  if(subEl) {
+    var meses = ['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    if(metricsFilterMes || metricsFilterAno) {
+      subEl.textContent = 'Período: ' + (metricsFilterMes ? meses[parseInt(metricsFilterMes)] : 'todos os meses') + (metricsFilterAno ? ' / ' + metricsFilterAno : '');
+    } else {
+      subEl.textContent = 'Calculado com base nas solicitações + tabela de custos';
+    }
+  }
   var tel = document.getElementById('totais-prov');
   if(tel) tel.innerHTML =
     '<div class="total-row"><span class="total-row-label">Total geral</span><span class="total-row-val blue">'+totalG.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})+'</span></div>'+
