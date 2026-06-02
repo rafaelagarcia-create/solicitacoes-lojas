@@ -1422,32 +1422,47 @@ function handleFiles(files) {
 function parseExcel(rows, filename) {
   if(!rows||rows.length<2){ showToast('Arquivo sem dados: '+filename); return; }
   var headers = rows[0].map(function(h){ return String(h||'').trim(); });
-  var iLoja = headers.findIndex(function(h){ return h.includes('compradora'); });
-  var iDesc = headers.findIndex(function(h){ return h.includes('Descri'); });
-  var iQtd  = headers.findIndex(function(h){ return h.includes('Quantidade'); });
-  var iVal  = headers.findIndex(function(h){ return h.includes('Valor total'); });
-  var iVu   = headers.findIndex(function(h){ return h.includes('unitário')||h.includes('unitario'); });
+  var iLoja   = headers.findIndex(function(h){ return h.includes('compradora'); });
+  var iDesc   = headers.findIndex(function(h){ return h.includes('Descri'); });
+  var iQtd    = headers.findIndex(function(h){ return h.includes('Quantidade'); });
+  var iVu     = headers.findIndex(function(h){ return h.includes('unitário')||h.includes('unitario'); });
+  // "Valor total c/ ajuste" — taken ONCE per pedido (same value in every row)
+  var iAjuste = headers.findIndex(function(h){ return h.includes('ajuste'); });
+  // fallback: "Valor total do pedido"
+  var iValTotal = headers.findIndex(function(h){ return h.includes('Valor total do pedido'); });
+
   var lojaRaw = rows[1]&&rows[1][iLoja]?String(rows[1][iLoja]):filename;
   var lojaCode = lojaRaw.split('|')[0].trim();
   var lojaNome = LOJAS_MAP_CODE[lojaCode]||lojaRaw;
+
+  // Get the unique pedido total (same across all rows — take from first data row)
+  var valorPedido = 0;
+  if(iAjuste >= 0) {
+    valorPedido = parseFloat(String(rows[1][iAjuste]||'0').replace(',','.'))||0;
+  } else if(iValTotal >= 0) {
+    valorPedido = parseFloat(String(rows[1][iValTotal]||'0').replace(',','.'))||0;
+  }
+
+  // Parse items (for display only — value is the pedido total, not per item)
   var parsed = rows.slice(1).map(function(row){
-    var vt = parseFloat(String(row[iVal]||'0').replace(',','.'))||0;
     var vu = parseFloat(String(row[iVu]||'0').replace(',','.'))||0;
     var qt = parseFloat(String(row[iQtd]||'0').replace(',','.'))||0;
-    return { item:String(row[iDesc]||''), qtd:qt, valorUnit:vu, valorTotal:vt||vu*qt };
+    return { item:String(row[iDesc]||''), qtd:qt, valorUnit:vu, valorTotal:vu*qt };
   }).filter(function(r){ return r.item&&r.qtd>0; });
+
   embData = embData.filter(function(d){ return d.filename!==filename; });
-  embData.push({ loja:lojaNome, lojaCode:lojaCode, filename:filename, rows:parsed });
+  embData.push({ loja:lojaNome, lojaCode:lojaCode, filename:filename, rows:parsed, valorPedido:valorPedido });
+  saveEmbData();
   renderUploadList();
   var bp = document.getElementById('btn-process');
   if(bp) bp.style.display='flex';
-  showToast('Arquivo carregado: ' + filename);
+  showToast('Arquivo carregado: ' + filename + ' · R$ ' + valorPedido.toLocaleString('pt-BR',{minimumFractionDigits:2}));
 }
 
 function renderUploadList(){
   var el=document.getElementById('upload-list'); if(!el) return;
   el.innerHTML=embData.map(function(d,i){
-    var total=d.rows.reduce(function(a,r){ return a+(r.valorTotal||0); },0);
+    var total = d.valorPedido || d.rows.reduce(function(a,r){ return a+(r.valorTotal||0); },0);
     return '<div class="upload-item">'+
       '<span style="color:var(--green)">✅</span>'+
       '<span class="upload-item-name">'+d.filename+'</span>'+
@@ -1458,10 +1473,39 @@ function renderUploadList(){
   }).join('');
 }
 
+
+// ── EMB DATA PERSISTENCE ──
+function saveEmbData() {
+  try {
+    var toSave = embData.map(function(d){
+      return { loja:d.loja, lojaCode:d.lojaCode, filename:d.filename, valorPedido:d.valorPedido, rows:d.rows };
+    });
+    localStorage.setItem('embData_v2', JSON.stringify(toSave));
+  } catch(e) { console.log('localStorage not available'); }
+}
+
+function loadEmbData() {
+  try {
+    var saved = localStorage.getItem('embData_v2');
+    if(saved) {
+      embData = JSON.parse(saved);
+      renderUploadList();
+      if(embData.length) {
+        var bp = document.getElementById('btn-process');
+        if(bp) bp.style.display = 'flex';
+        processEmbalagens();
+      }
+    }
+  } catch(e) { embData = []; }
+}
+
 function removeEmbFile(i){
-  embData.splice(i,1); renderUploadList();
+  embData.splice(i,1);
+  saveEmbData();
+  renderUploadList();
   if(!embData.length){ var bp=document.getElementById('btn-process'); if(bp) bp.style.display='none'; }
   var ce=document.getElementById('chart-emb-loja'); if(ce) ce.innerHTML='';
+  if(embData.length) processEmbalagens();
 }
 
 function processEmbalagens(){
@@ -1471,7 +1515,9 @@ function processEmbalagens(){
   embData.forEach(function(d){
     var match=LOJAS_FULL.find(function(l){ return l.startsWith(d.lojaCode); })||d.loja;
     if(!byLoja[match]) byLoja[match]={total:0,qtd:0};
-    d.rows.forEach(function(r){ byLoja[match].total+=(r.valorTotal||(r.valorUnit*r.qtd)); byLoja[match].qtd+=r.qtd; });
+    // Use valorPedido (unique total per pedido, not sum of rows)
+    byLoja[match].total += d.valorPedido || 0;
+    d.rows.forEach(function(r){ byLoja[match].qtd += r.qtd; });
   });
   var resultados=LOJAS_FULL.map(function(l,i){ return {nome:l.split(' - ')[1],total:byLoja[l]?byLoja[l].total:0,qtd:byLoja[l]?byLoja[l].qtd:0,color:LOJA_COLORS[i]}; });
   var maxV=Math.max.apply(null,resultados.map(function(r){ return r.total; }).concat([1]));
@@ -1541,6 +1587,7 @@ function renderEmbItem(solId,e,i){
 
 // Upload zone click
 document.addEventListener('DOMContentLoaded',function(){
+  loadEmbData();
   var uz=document.getElementById('upload-zone');
   if(uz){ uz.addEventListener('click',function(){ document.getElementById('file-input').click(); }); uz.addEventListener('dragover',dragOver); uz.addEventListener('dragleave',dragLeave); uz.addEventListener('drop',dropFile); }
 });
