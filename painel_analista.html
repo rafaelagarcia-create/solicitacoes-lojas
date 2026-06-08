@@ -1427,7 +1427,8 @@ function parseExcel(rows, filename) {
   var iQtd    = headers.findIndex(function(h){ return h.includes('Quantidade'); });
   var iVu     = headers.findIndex(function(h){ return h.includes('unitário')||h.includes('unitario'); });
   // "Valor total c/ ajuste" — taken ONCE per pedido (same value in every row)
-  var iAjuste = headers.findIndex(function(h){ return h.includes('ajuste'); });
+  // Must match "Valor total c/ ajuste" specifically (not "Valor do ajuste")
+  var iAjuste = headers.findIndex(function(h){ return h.includes('c/') || (h.includes('total') && h.includes('ajuste')); });
   // fallback: "Valor total do pedido"
   var iValTotal = headers.findIndex(function(h){ return h.includes('Valor total do pedido'); });
 
