@@ -723,6 +723,17 @@ tbody tr:hover td { background: var(--surface2); }
 }
 .filter-active-badge.show { display: inline-block; }
 
+
+.emb-metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:1.25rem; }
+.emb-metric { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); padding:1rem 1.25rem; }
+.emb-metric-label { font-family:var(--mono); font-size:10px; color:var(--text-3); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:6px; }
+.emb-metric-value { font-size:20px; font-weight:700; font-family:var(--mono); letter-spacing:-0.02em; }
+.emb-metric-value.blue { color:var(--blue); }
+.emb-metric-value.green { color:var(--green); }
+.emb-metric-value.amber { color:var(--amber); }
+.emb-metric-value.red { color:var(--red); }
+.emb-metric-sub { font-size:10px; color:var(--text-3); margin-top:3px; }
+
 .upload-zone{border:2px dashed var(--border2);border-radius:var(--radius-lg);padding:2rem;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--surface2);margin-bottom:1.5rem}
 .upload-zone:hover,.upload-zone.drag{border-color:var(--blue);background:var(--blue-dim)}
 .upload-zone input{display:none}
@@ -964,19 +975,50 @@ tbody tr:hover td { background: var(--surface2); }
 
     <div class="chart-card">
       <div class="chart-card-title">📦 Pedidos de embalagens por loja</div>
-      <div class="chart-card-sub">Importe os Excels de pedidos exportados do sistema</div>
-      <label class="upload-zone" id="upload-zone">
-        <input type="file" id="file-input" accept=".xlsx,.xls" multiple onchange="handleFiles(this.files)">
-        <div class="upload-zone-icon">📂</div>
-        <div class="upload-zone-title">Clique ou arraste os arquivos Excel aqui</div>
-        <div class="upload-zone-sub">Aceita múltiplos arquivos .xlsx</div>
-      </label>
-      <div class="upload-list" id="upload-list"></div>
-      <button class="btn btn-primary" id="btn-process" onclick="processEmbalagens()" style="display:none;margin-bottom:1rem">
-        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-        Processar arquivos
-      </button>
+      <div class="chart-card-sub" id="emb-periodo-sub">Importe os Excels de pedidos exportados do sistema</div>
+
+      <!-- METRICS CARDS -->
+      <div class="emb-metrics" id="emb-metrics" style="display:none">
+        <div class="emb-metric">
+          <div class="emb-metric-label">Total gasto</div>
+          <div class="emb-metric-value blue" id="emb-total-val">R$ 0</div>
+          <div class="emb-metric-sub">todas as lojas</div>
+        </div>
+        <div class="emb-metric">
+          <div class="emb-metric-label">Média por unidade</div>
+          <div class="emb-metric-value green" id="emb-media-val">R$ 0</div>
+          <div class="emb-metric-sub">valor total ÷ qtd itens</div>
+        </div>
+        <div class="emb-metric">
+          <div class="emb-metric-label">Maior gasto</div>
+          <div class="emb-metric-value amber" id="emb-maior-val">—</div>
+          <div class="emb-metric-sub" id="emb-maior-loja"></div>
+        </div>
+        <div class="emb-metric">
+          <div class="emb-metric-label">Menor gasto</div>
+          <div class="emb-metric-value red" id="emb-menor-val">—</div>
+          <div class="emb-metric-sub" id="emb-menor-loja"></div>
+        </div>
+      </div>
+
+      <!-- CHART -->
       <div id="chart-emb-loja"></div>
+
+      <!-- UPLOAD AREA -->
+      <div style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border)">
+        <div style="font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.06em;font-family:var(--mono)">Arquivos importados</div>
+        <label class="upload-zone" id="upload-zone">
+          <input type="file" id="file-input" accept=".xlsx,.xls" multiple onchange="handleFiles(this.files)">
+          <div class="upload-zone-icon">📂</div>
+          <div class="upload-zone-title">Clique ou arraste os arquivos Excel aqui</div>
+          <div class="upload-zone-sub">Aceita múltiplos arquivos .xlsx</div>
+        </label>
+        <div class="upload-list" id="upload-list"></div>
+        <button class="btn btn-primary" id="btn-process" onclick="processEmbalagens()" style="display:none;margin-top:0.5rem">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          Processar arquivos
+        </button>
+      </div>
     </div>
   </div>
 
@@ -1528,7 +1570,19 @@ function processEmbalagens(){
     return '<div class="chart-bar-row"><div class="chart-bar-header"><span class="chart-bar-loja">'+r.nome+'</span><span class="chart-bar-val">'+fmt+(r.qtd?' · '+r.qtd+' unid.':'')+'</span></div><div class="chart-track"><div class="chart-fill" style="width:'+pct+'%;background:'+r.color+'"></div></div></div>';
   }).join('');
   var totalE=resultados.reduce(function(a,r){ return a+r.total; },0);
-  html+='<div style="margin-top:1rem"><div class="total-row"><span class="total-row-label">Total gasto em embalagens</span><span class="total-row-val blue">'+totalE.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})+'</span></div></div>';
+  var totalQtd=embData.reduce(function(a,d){ return a+d.rows.reduce(function(b,r){ return b+r.qtd; },0); },0);
+  var media=totalQtd>0?totalE/totalQtd:0;
+  var comValor=resultados.filter(function(r){ return r.total>0; });
+  var maior=comValor.length?comValor.reduce(function(a,b){ return a.total>b.total?a:b; }):null;
+  var menor=comValor.length?comValor.reduce(function(a,b){ return a.total<b.total?a:b; }):null;
+  var fmt=function(v){ return v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); };
+  var em=document.getElementById('emb-metrics'); if(em) em.style.display='grid';
+  var e1=document.getElementById('emb-total-val'); if(e1) e1.textContent=fmt(totalE);
+  var e2=document.getElementById('emb-media-val'); if(e2) e2.textContent=fmt(media);
+  var e3=document.getElementById('emb-maior-val'); if(e3) e3.textContent=maior?fmt(maior.total):'—';
+  var e3l=document.getElementById('emb-maior-loja'); if(e3l) e3l.textContent=maior?maior.nome:'';
+  var e4=document.getElementById('emb-menor-val'); if(e4) e4.textContent=menor?fmt(menor.total):'—';
+  var e4l=document.getElementById('emb-menor-loja'); if(e4l) e4l.textContent=menor?menor.nome:'';
   var ce=document.getElementById('chart-emb-loja'); if(ce) ce.innerHTML=html;
   showToast('Dados processados com sucesso!');
 }
