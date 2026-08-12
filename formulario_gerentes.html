@@ -248,6 +248,178 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
       </div>
     </div>
 
+
+    <!-- IRREGULARIDADES -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:rgba(239,68,68,0.1)">
+          <svg width="16" height="16" fill="none" stroke="#FCA5A5" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div><h2>Irregularidades no Recebimento</h2><p>Falta, avaria ou defeito de fábrica</p></div>
+      </div>
+      <div class="card-body">
+
+        <!-- DADOS COMUNS -->
+        <div class="form-grid" style="margin-bottom:1rem">
+          <div class="field">
+            <label>Nº da Nota Fiscal</label>
+            <input type="text" id="irreg-nf" placeholder="Ex: 123456">
+          </div>
+          <div class="field">
+            <label>Telefone</label>
+            <input type="text" id="irreg-tel" placeholder="(00) 00000-0000">
+          </div>
+        </div>
+
+        <!-- TABS -->
+        <div class="irreg-tabs">
+          <button class="irreg-tab falta active" onclick="switchIrreg('falta')">🔴 Falta</button>
+          <button class="irreg-tab avaria" onclick="switchIrreg('avaria')">🟡 Avaria</button>
+          <button class="irreg-tab defeito" onclick="switchIrreg('defeito')">🟣 Defeito de Fábrica</button>
+        </div>
+
+        <!-- FALTA -->
+        <div class="irreg-section active" id="irreg-falta">
+          <div class="irreg-header falta">🔴 Produtos com falta no recebimento</div>
+          <div class="inline-alert" id="alert-irreg-falta"></div>
+          <div class="irreg-items-list" id="falta-list">
+            <div style="font-size:12px;color:var(--hint);padding:4px 0">Nenhum item adicionado ainda.</div>
+          </div>
+          <div class="add-row">
+            <div>
+              <label>Código do produto</label>
+              <input type="text" id="falta-sku" placeholder="Ex: 48130" oninput="previewSKU('falta-sku','falta-hint')">
+              <div class="sku-hint" id="falta-hint"></div>
+            </div>
+            <div><label>Qtd faltando</label><input type="number" id="falta-qtd" min="1" value="1"></div>
+            <div><label style="visibility:hidden">x</label><button class="btn-add" onclick="addIrregItem('falta')">+ Add</button></div>
+          </div>
+        </div>
+
+        <!-- AVARIA -->
+        <div class="irreg-section" id="irreg-avaria">
+          <div class="irreg-header avaria">🟡 Produtos com avaria</div>
+          <div class="inline-alert" id="alert-irreg-avaria"></div>
+          <div class="irreg-items-list" id="avaria-list">
+            <div style="font-size:12px;color:var(--hint);padding:4px 0">Nenhum item adicionado ainda.</div>
+          </div>
+          <div style="margin-bottom:10px">
+            <div class="form-grid">
+              <div class="field">
+                <label>Código do produto</label>
+                <input type="text" id="avaria-sku" placeholder="Ex: 48130" oninput="previewSKU('avaria-sku','avaria-hint')">
+                <div class="sku-hint" id="avaria-hint"></div>
+              </div>
+              <div class="field">
+                <label>Tipo de avaria</label>
+                <select id="avaria-tipo">
+                  <option value="">Selecione...</option>
+                  <option>Amassado</option>
+                  <option>Quebrado</option>
+                  <option>Vazando</option>
+                  <option>Outro</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Nº da caixa</label>
+                <input type="text" id="avaria-caixa" placeholder="Ex: 001">
+              </div>
+              <div class="field">
+                <label>Quantidade</label>
+                <input type="number" id="avaria-qtd" min="1" value="1">
+              </div>
+            </div>
+            <button class="btn-add" style="width:100%;margin-top:4px" onclick="addIrregItem('avaria')">+ Adicionar item de avaria</button>
+          </div>
+        </div>
+
+        <!-- DEFEITO DE FÁBRICA -->
+        <div class="irreg-section" id="irreg-defeito">
+          <div class="irreg-header defeito">🟣 Defeito de fábrica</div>
+
+          <div style="margin-bottom:1rem">
+            <label>Origem do defeito</label>
+            <div class="origem-toggle">
+              <button class="origem-btn active" id="origem-loja" onclick="setOrigem('loja')">🏪 Detectado na loja</button>
+              <button class="origem-btn" id="origem-consumidor" onclick="setOrigem('consumidor')">👤 Trazido por consumidor</button>
+            </div>
+          </div>
+
+          <div class="consumidor-fields" id="consumidor-fields">
+            <div class="form-grid" style="margin-bottom:1rem">
+              <div class="field full">
+                <label>Nome do consumidor</label>
+                <input type="text" id="defeito-consumidor-nome" placeholder="Nome completo">
+              </div>
+              <div class="field">
+                <label>CPF</label>
+                <input type="text" id="defeito-consumidor-cpf" placeholder="000.000.000-00">
+              </div>
+              <div class="field">
+                <label>Celular</label>
+                <input type="text" id="defeito-consumidor-cel" placeholder="(00) 00000-0000">
+              </div>
+            </div>
+          </div>
+
+          <div class="inline-alert" id="alert-irreg-defeito"></div>
+          <div class="irreg-items-list" id="defeito-list">
+            <div style="font-size:12px;color:var(--hint);padding:4px 0">Nenhum item adicionado ainda.</div>
+          </div>
+          <div style="margin-bottom:10px">
+            <div class="form-grid">
+              <div class="field">
+                <label>Código do produto</label>
+                <input type="text" id="defeito-sku" placeholder="Ex: 48130" oninput="previewSKU('defeito-sku','defeito-hint')">
+                <div class="sku-hint" id="defeito-hint"></div>
+              </div>
+              <div class="field">
+                <label>Quantidade</label>
+                <input type="number" id="defeito-qtd" min="1" value="1">
+              </div>
+              <div class="field">
+                <label>Lote</label>
+                <input type="text" id="defeito-lote" placeholder="Código do lote">
+              </div>
+              <div class="field">
+                <label>Lote validado</label>
+                <input type="text" id="defeito-lote-val" placeholder="Lote validado">
+              </div>
+              <div class="field">
+                <label>Categoria do problema</label>
+                <select id="defeito-categoria">
+                  <option value="">Selecione...</option>
+                  <option>Embalagem danificada</option>
+                  <option>Produto com odor alterado</option>
+                  <option>Produto com textura alterada</option>
+                  <option>Produto com cor alterada</option>
+                  <option>Corpo estranho</option>
+                  <option>Vazamento</option>
+                  <option>Outro</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Motivo</label>
+                <select id="defeito-motivo">
+                  <option value="">Selecione...</option>
+                  <option>Defeito de fabricação</option>
+                  <option>Avaria no transporte</option>
+                  <option>Produto vencido</option>
+                  <option>Outro</option>
+                </select>
+              </div>
+              <div class="field full">
+                <label>Observação</label>
+                <input type="text" id="defeito-obs" placeholder="Descreva o problema...">
+              </div>
+            </div>
+            <button class="btn-add" style="width:100%;margin-top:4px" onclick="addIrregItem('defeito')">+ Adicionar item de defeito</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
     <div class="submit-wrap">
       <button class="btn-submit" id="btn-submit" onclick="submitForm()">
         <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
@@ -273,6 +445,103 @@ var dupPendingType = null; // 'prov' ou 'emb'
 var dupPendingData = null; // {codigo, nome, qtd} ou {item, qtd}
 
 // ─── LOAD SKUs ───
+
+// ── IRREGULARIDADES ──
+var irregItems = { falta:[], avaria:[], defeito:[] };
+var defeitoOrigem = 'loja';
+
+function switchIrreg(tipo) {
+  document.querySelectorAll('.irreg-tab').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelectorAll('.irreg-section').forEach(function(s){ s.classList.remove('active'); });
+  document.querySelector('.irreg-tab.' + tipo).classList.add('active');
+  document.getElementById('irreg-' + tipo).classList.add('active');
+}
+
+function setOrigem(origem) {
+  defeitoOrigem = origem;
+  document.getElementById('origem-loja').classList.toggle('active', origem === 'loja');
+  document.getElementById('origem-consumidor').classList.toggle('active', origem === 'consumidor');
+  var cf = document.getElementById('consumidor-fields');
+  if(cf) cf.classList.toggle('show', origem === 'consumidor');
+}
+
+function addIrregItem(tipo) {
+  if(tipo === 'falta') {
+    var code = document.getElementById('falta-sku').value.trim();
+    var qtd = parseInt(document.getElementById('falta-qtd').value)||1;
+    if(!code){ alert('Digite o código do produto.'); return; }
+    var nome = SKU_MAP[code] || 'Produto não cadastrado';
+    irregItems.falta.push({ codigo:code, nome:nome, qtd:qtd });
+    document.getElementById('falta-sku').value='';
+    document.getElementById('falta-qtd').value='1';
+    document.getElementById('falta-hint').className='sku-hint';
+  } else if(tipo === 'avaria') {
+    var code = document.getElementById('avaria-sku').value.trim();
+    var tipoAv = document.getElementById('avaria-tipo').value;
+    var caixa = document.getElementById('avaria-caixa').value.trim();
+    var qtd = parseInt(document.getElementById('avaria-qtd').value)||1;
+    if(!code || !tipoAv){ alert('Preencha o código e o tipo de avaria.'); return; }
+    var nome = SKU_MAP[code] || 'Produto não cadastrado';
+    irregItems.avaria.push({ codigo:code, nome:nome, tipo:tipoAv, caixa:caixa, qtd:qtd });
+    document.getElementById('avaria-sku').value='';
+    document.getElementById('avaria-tipo').value='';
+    document.getElementById('avaria-caixa').value='';
+    document.getElementById('avaria-qtd').value='1';
+    document.getElementById('avaria-hint').className='sku-hint';
+  } else if(tipo === 'defeito') {
+    var code = document.getElementById('defeito-sku').value.trim();
+    var qtd = parseInt(document.getElementById('defeito-qtd').value)||1;
+    var lote = document.getElementById('defeito-lote').value.trim();
+    var loteVal = document.getElementById('defeito-lote-val').value.trim();
+    var cat = document.getElementById('defeito-categoria').value;
+    var mot = document.getElementById('defeito-motivo').value;
+    var obs = document.getElementById('defeito-obs').value.trim();
+    if(!code || !cat || !mot){ alert('Preencha o código, categoria e motivo.'); return; }
+    var nome = SKU_MAP[code] || 'Produto não cadastrado';
+    var consumidor = defeitoOrigem === 'consumidor' ? {
+      nome: document.getElementById('defeito-consumidor-nome').value.trim(),
+      cpf: document.getElementById('defeito-consumidor-cpf').value.trim(),
+      cel: document.getElementById('defeito-consumidor-cel').value.trim()
+    } : null;
+    irregItems.defeito.push({ codigo:code, nome:nome, qtd:qtd, lote:lote, loteVal:loteVal, categoria:cat, motivo:mot, obs:obs, origem:defeitoOrigem, consumidor:consumidor });
+    document.getElementById('defeito-sku').value='';
+    document.getElementById('defeito-qtd').value='1';
+    document.getElementById('defeito-lote').value='';
+    document.getElementById('defeito-lote-val').value='';
+    document.getElementById('defeito-categoria').value='';
+    document.getElementById('defeito-motivo').value='';
+    document.getElementById('defeito-obs').value='';
+    document.getElementById('defeito-hint').className='sku-hint';
+  }
+  renderIrregList(tipo);
+}
+
+function removeIrregItem(tipo, i) {
+  irregItems[tipo].splice(i,1);
+  renderIrregList(tipo);
+}
+
+function renderIrregList(tipo) {
+  var el = document.getElementById(tipo+'-list');
+  if(!el) return;
+  if(!irregItems[tipo].length){
+    el.innerHTML='<div style="font-size:12px;color:var(--hint);padding:4px 0">Nenhum item adicionado ainda.</div>';
+    return;
+  }
+  el.innerHTML = irregItems[tipo].map(function(p,i){
+    var detail = '';
+    if(tipo==='avaria') detail = p.tipo + (p.caixa ? ' · Cx '+p.caixa : '');
+    if(tipo==='defeito') detail = p.categoria + ' · ' + p.motivo + (p.lote?' · Lote '+p.lote:'');
+    return '<div class="irreg-item">'+
+      '<div class="irreg-item-header">'+
+        '<span class="irreg-item-name">'+p.nome+'</span>'+
+        '<button class="rm" onclick="removeIrregItem(''+tipo+'','+i+')">×</button>'+
+      '</div>'+
+      '<div class="irreg-item-detail">SKU '+p.codigo+' · Qtd '+p.qtd+(detail?' · '+detail:'')+'</div>'+
+    '</div>';
+  }).join('');
+}
+
 async function loadSKUs() {
   var bar = document.getElementById('progress-bar');
   bar.style.width = '30%';
@@ -321,7 +590,7 @@ function renderPainelSituacao(loja) {
   '</div>';
 
   // Recent 5 solicitacoes
-  var recentes = lojaData.slice().sort(function(a,b){ return new Date(b.data)-new Date(a.data); }).slice(0,5);
+  var recentes = lojaData.slice().sort(function(a,b){ return new Date(b.data)-new Date(a.data); }).slice(0,2);
   if (recentes.length) {
     html += '<div class="semana-label">Solicitações recentes</div><div class="sol-list">';
     recentes.forEach(function(s) {
@@ -522,6 +791,13 @@ async function submitForm() {
     id: 'SOL-' + Date.now(),
     loja: loja, gerente: gerente, obs: obs,
     provadores: JSON.parse(JSON.stringify(provItems)),
+    irregularidades: {
+      nf: document.getElementById('irreg-nf').value.trim(),
+      telefone: document.getElementById('irreg-tel').value.trim(),
+      falta: JSON.parse(JSON.stringify(irregItems.falta)),
+      avaria: JSON.parse(JSON.stringify(irregItems.avaria)),
+      defeito: JSON.parse(JSON.stringify(irregItems.defeito))
+    },
     embalagens: JSON.parse(JSON.stringify(embItems)),
     data: new Date().toISOString(),
     status: 'Pendente'
@@ -544,6 +820,8 @@ async function submitForm() {
 
 function novaForm() {
   provItems = []; embItems = []; lojaData = [];
+  irregItems = { falta:[], avaria:[], defeito:[] };
+  ['falta','avaria','defeito'].forEach(function(t){ renderIrregList(t); });
   renderProv(); renderEmb();
   ['f-loja','f-gerente','f-obs'].forEach(function(id){ document.getElementById(id).value = ''; });
   document.getElementById('painel-situacao').classList.remove('show');
