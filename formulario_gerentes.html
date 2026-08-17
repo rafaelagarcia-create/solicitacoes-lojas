@@ -528,18 +528,31 @@ function renderIrregList(tipo) {
     el.innerHTML='<div style="font-size:12px;color:var(--hint);padding:4px 0">Nenhum item adicionado ainda.</div>';
     return;
   }
-  el.innerHTML = irregItems[tipo].map(function(p,i){
+  el.innerHTML = '';
+  irregItems[tipo].forEach(function(p, i) {
     var detail = '';
-    if(tipo==='avaria') detail = p.tipo + (p.caixa ? ' · Cx '+p.caixa : '');
-    if(tipo==='defeito') detail = p.categoria + ' · ' + p.motivo + (p.lote?' · Lote '+p.lote:'');
-    return '<div class="irreg-item">'+
-      '<div class="irreg-item-header">'+
-        '<span class="irreg-item-name">'+p.nome+'</span>'+
-        '<button class="rm" onclick="removeIrregItem(''+tipo+'','+i+')">×</button>'+
-      '</div>'+
-      '<div class="irreg-item-detail">SKU '+p.codigo+' · Qtd '+p.qtd+(detail?' · '+detail:'')+'</div>'+
-    '</div>';
-  }).join('');
+    if (tipo === 'avaria') detail = p.tipo + (p.caixa ? ' · Cx ' + p.caixa : '');
+    if (tipo === 'defeito') detail = p.categoria + ' · ' + p.motivo + (p.lote ? ' · Lote ' + p.lote : '');
+    var div = document.createElement('div');
+    div.className = 'irreg-item';
+    var hdr = document.createElement('div');
+    hdr.className = 'irreg-item-header';
+    var sp = document.createElement('span');
+    sp.className = 'irreg-item-name';
+    sp.textContent = p.nome;
+    var btn = document.createElement('button');
+    btn.className = 'rm';
+    btn.textContent = '×';
+    btn.onclick = (function(t, idx) { return function() { removeIrregItem(t, idx); }; })(tipo, i);
+    hdr.appendChild(sp);
+    hdr.appendChild(btn);
+    var det = document.createElement('div');
+    det.className = 'irreg-item-detail';
+    det.textContent = 'SKU ' + p.codigo + ' · Qtd ' + p.qtd + (detail ? ' · ' + detail : '');
+    div.appendChild(hdr);
+    div.appendChild(det);
+    el.appendChild(div);
+  });
 }
 
 async function loadSKUs() {
