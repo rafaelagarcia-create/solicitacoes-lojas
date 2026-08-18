@@ -255,7 +255,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
         <div class="card-icon" style="background:rgba(239,68,68,0.1)">
           <svg width="16" height="16" fill="none" stroke="#FCA5A5" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
         </div>
-        <div><h2>Irregularidades no Recebimento</h2><p>Falta, avaria ou defeito de fábrica</p></div>
+        <div><h2>Irregularidades no Recebimento</h2><p>Registre falta, avaria ou defeito</p></div>
       </div>
       <div class="card-body">
 
@@ -271,15 +271,19 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
           </div>
         </div>
 
-        <!-- TABS -->
-        <div class="irreg-tabs">
-          <button class="irreg-tab falta active" onclick="switchIrreg('falta')">🔴 Falta</button>
-          <button class="irreg-tab avaria" onclick="switchIrreg('avaria')">🟡 Avaria</button>
-          <button class="irreg-tab defeito" onclick="switchIrreg('defeito')">🟣 Defeito de Fábrica</button>
+        <!-- SELETOR TIPO -->
+        <div class="field" style="margin-bottom:1rem">
+          <label>Tipo de irregularidade</label>
+          <select id="irreg-tipo-select" onchange="onIrregTipoChange()">
+            <option value="">Selecione o tipo...</option>
+            <option value="falta">🔴 Falta</option>
+            <option value="avaria">🟡 Avaria</option>
+            <option value="defeito">🟣 Defeito de Fábrica</option>
+          </select>
         </div>
 
         <!-- FALTA -->
-        <div class="irreg-section active" id="irreg-falta">
+        <div class="irreg-section" id="irreg-falta">
           <div class="irreg-header falta">🔴 Produtos com falta no recebimento</div>
           <div class="inline-alert" id="alert-irreg-falta"></div>
           <div class="irreg-items-list" id="falta-list">
@@ -329,7 +333,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
                 <input type="number" id="avaria-qtd" min="1" value="1">
               </div>
             </div>
-            <button class="btn-add" style="width:100%;margin-top:4px" onclick="addIrregItem('avaria')">+ Adicionar item de avaria</button>
+            <button class="btn-add" style="width:100%;margin-top:4px" onclick="addIrregItem('avaria')">+ Adicionar item</button>
           </div>
         </div>
 
@@ -337,11 +341,12 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
         <div class="irreg-section" id="irreg-defeito">
           <div class="irreg-header defeito">🟣 Defeito de fábrica</div>
 
+          <!-- SUB-TIPO DEFEITO -->
           <div style="margin-bottom:1rem">
-            <label>Origem do defeito</label>
+            <label>Origem</label>
             <div class="origem-toggle">
-              <button class="origem-btn active" id="origem-loja" onclick="setOrigem('loja')">🏪 Detectado na loja</button>
-              <button class="origem-btn" id="origem-consumidor" onclick="setOrigem('consumidor')">👤 Trazido por consumidor</button>
+              <button class="origem-btn active" id="origem-loja" onclick="setOrigem('loja')">🏪 Identificado na loja</button>
+              <button class="origem-btn" id="origem-consumidor" onclick="setOrigem('consumidor')">👤 Troca por consumidor</button>
             </div>
           </div>
 
@@ -377,13 +382,9 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
                 <label>Quantidade</label>
                 <input type="number" id="defeito-qtd" min="1" value="1">
               </div>
-              <div class="field">
+              <div class="field full">
                 <label>Lote</label>
                 <input type="text" id="defeito-lote" placeholder="Código do lote">
-              </div>
-              <div class="field">
-                <label>Lote validado</label>
-                <input type="text" id="defeito-lote-val" placeholder="Lote validado">
               </div>
               <div class="field">
                 <label>Categoria do problema</label>
@@ -413,7 +414,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
                 <input type="text" id="defeito-obs" placeholder="Descreva o problema...">
               </div>
             </div>
-            <button class="btn-add" style="width:100%;margin-top:4px" onclick="addIrregItem('defeito')">+ Adicionar item de defeito</button>
+            <button class="btn-add" style="width:100%;margin-top:4px" onclick="addIrregItem('defeito')">+ Adicionar item</button>
           </div>
         </div>
 
@@ -450,11 +451,15 @@ var dupPendingData = null; // {codigo, nome, qtd} ou {item, qtd}
 var irregItems = { falta:[], avaria:[], defeito:[] };
 var defeitoOrigem = 'loja';
 
-function switchIrreg(tipo) {
-  document.querySelectorAll('.irreg-tab').forEach(function(t){ t.classList.remove('active'); });
+function onIrregTipoChange() {
+  var tipo = document.getElementById('irreg-tipo-select').value;
   document.querySelectorAll('.irreg-section').forEach(function(s){ s.classList.remove('active'); });
-  document.querySelector('.irreg-tab.' + tipo).classList.add('active');
-  document.getElementById('irreg-' + tipo).classList.add('active');
+  if(tipo) document.getElementById('irreg-' + tipo).classList.add('active');
+}
+
+function switchIrreg(tipo) {
+  document.querySelectorAll('.irreg-section').forEach(function(s){ s.classList.remove('active'); });
+  if(tipo) document.getElementById('irreg-' + tipo).classList.add('active');
 }
 
 function setOrigem(origem) {
@@ -794,7 +799,8 @@ async function submitForm() {
   var gerente = document.getElementById('f-gerente').value.trim();
   var obs = document.getElementById('f-obs').value.trim();
   if (!loja || !gerente) { alert('Preencha a loja e o seu nome.'); return; }
-  if (!provItems.length && !embItems.length) { alert('Adicione ao menos um item.'); return; }
+  var totalIrreg = irregItems.falta.length + irregItems.avaria.length + irregItems.defeito.length;
+  if (!provItems.length && !embItems.length && !totalIrreg) { alert('Adicione ao menos um item em qualquer seção.'); return; }
 
   var btn = document.getElementById('btn-submit');
   btn.disabled = true;
@@ -835,6 +841,8 @@ function novaForm() {
   provItems = []; embItems = []; lojaData = [];
   irregItems = { falta:[], avaria:[], defeito:[] };
   ['falta','avaria','defeito'].forEach(function(t){ renderIrregList(t); });
+  var its = document.getElementById('irreg-tipo-select'); if(its) its.value='';
+  document.querySelectorAll('.irreg-section').forEach(function(s){ s.classList.remove('active'); });
   renderProv(); renderEmb();
   ['f-loja','f-gerente','f-obs'].forEach(function(id){ document.getElementById(id).value = ''; });
   document.getElementById('painel-situacao').classList.remove('show');
