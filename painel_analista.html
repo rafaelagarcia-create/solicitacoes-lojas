@@ -1076,13 +1076,30 @@ var STATUS_MAP = {
 var allData = [];
 var currentId = null;
 
+async function fetchWithRetry(url, tries) {
+  tries = tries || 3;
+  for (var i = 0; i < tries; i++) {
+    try {
+      var ctrl = new AbortController();
+      var tid = setTimeout(function(){ ctrl.abort(); }, 20000);
+      var resp = await fetch(url, { signal: ctrl.signal });
+      clearTimeout(tid);
+      var text = await resp.text();
+      try { return JSON.parse(text); }
+      catch(e) { throw new Error('Apps Script indisponível. Tente novamente em alguns segundos.'); }
+    } catch(e) {
+      if (i === tries - 1) throw e;
+      await new Promise(function(r){ setTimeout(r, 2000 * (i + 1)); });
+    }
+  }
+}
+
 async function loadData() {
   var btn = document.getElementById('btn-refresh');
   btn.innerHTML = '<span class="spinner"></span> Carregando...';
   btn.disabled = true;
   try {
-    var resp = await fetch(SCRIPT_URL + '?action=READ');
-    var data = await resp.json();
+    var data = await fetchWithRetry(SCRIPT_URL + '?action=READ');
     allData = Array.isArray(data) ? data : [];
     var __efootercount=document.getElementById('footer-count'); if(__efootercount) __efootercount.textContent = allData.length;
     renderTable();

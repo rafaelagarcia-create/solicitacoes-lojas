@@ -794,7 +794,10 @@ function renderEmb() {
 }
 
 // ─── SUBMIT ───
+var _submitting = false;
+
 async function submitForm() {
+  if (_submitting) return;
   var loja = document.getElementById('f-loja').value;
   var gerente = document.getElementById('f-gerente').value.trim();
   var obs = document.getElementById('f-obs').value.trim();
@@ -802,6 +805,7 @@ async function submitForm() {
   var totalIrreg = irregItems.falta.length + irregItems.avaria.length + irregItems.defeito.length;
   if (!provItems.length && !embItems.length && !totalIrreg) { alert('Adicione ao menos um item em qualquer seção.'); return; }
 
+  _submitting = true;
   var btn = document.getElementById('btn-submit');
   btn.disabled = true;
   btn.innerHTML = '<span class="btn-spinner"></span> Enviando...';
@@ -838,6 +842,7 @@ async function submitForm() {
 }
 
 function novaForm() {
+  _submitting = false;
   provItems = []; embItems = []; lojaData = [];
   irregItems = { falta:[], avaria:[], defeito:[] };
   ['falta','avaria','defeito'].forEach(function(t){ renderIrregList(t); });
