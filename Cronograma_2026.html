@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cronograma 2026 — Analista de Estoque</title>
+<style>
+:root{--bg:#0f1012;--surface:#16181c;--card:#1e2128;--card2:#252830;--border:#2a2d35;--text:#f0f2f5;--muted:#6a7080;--dim:#2a2d35;--accent:#6c63ff}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',Arial,sans-serif;min-height:100vh}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100;flex-wrap:wrap}
+.logo{font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.05em;white-space:nowrap}
+.sub{font-size:11px;color:var(--muted);margin-top:1px}
+.top-stores{display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding:4px 12px;background:rgba(108,99,255,.08);border:1px solid rgba(108,99,255,.18);border-radius:8px;margin-left:4px}
+.ts-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+.ts-pill{font-size:11px;padding:2px 9px;border-radius:100px;font-weight:500;display:flex;align-items:center;gap:4px}
+.ts-count{font-size:10px;opacity:.75}
+.nav{display:flex;align-items:center;gap:8px;margin-left:auto}
+.nbtn{background:var(--card);border:1px solid var(--border);color:var(--text);width:30px;height:30px;border-radius:6px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+.nbtn:hover{background:var(--border)}
+.mlabel{font-size:15px;font-weight:600;min-width:190px;text-align:center}
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.fbtn{font-size:11px;padding:4px 12px;border-radius:100px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .15s}
+.fbtn.on{color:var(--text);border-color:transparent}
+.fbtn[data-f="calib"].on{background:#1a4d7a}
+.fbtn[data-f="antilha"].on{background:#2a5c0a}
+.fbtn[data-f="invent"].on{background:#8c3a18}
+.fbtn[data-f="visita"].on{background:#5a3a8c}
+.wrap{padding:16px 16px 56px}
+.wdays{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:2px}
+.wd{text-align:center;font-size:11px;font-weight:500;color:var(--muted);padding:5px 0;text-transform:uppercase;letter-spacing:.05em}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.day{background:var(--card);border-radius:6px;min-height:90px;padding:6px 7px 5px;cursor:pointer;border:1px solid transparent;transition:background .1s}
+.day:hover{background:var(--card2);border-color:var(--border)}
+.day.wkd{background:var(--surface)}
+.day.other{opacity:.2;pointer-events:none}
+.day.today{border-color:var(--accent)!important}
+.day.inv{border-left:3px solid #8c3a18}
+.day.dim{opacity:.25}
+.dn{font-size:12px;font-weight:500;color:var(--muted);margin-bottom:3px}
+.day.today .dn{color:var(--accent);font-weight:700}
+.day.wkd .dn{color:var(--dim)}
+.pills{display:flex;flex-wrap:wrap;gap:2px;margin-bottom:3px}
+.pl{font-size:10px;padding:1px 6px;border-radius:100px;font-weight:500;white-space:nowrap}
+.pl-E{background:#3d3a8c;color:#d0cdff}
+.pl-R{background:#1a4d7a;color:#c8e4ff}
+.pl-S{background:#8c3a18;color:#ffe0d0}
+.pl-B{background:#2a5c0a;color:#c8f0b0}
+.pl-A{background:#8c2020;color:#ffd4d4}
+.pl-M{background:#3a3a46;color:#dcdcec}
+.pl-H{background:#6b4a08;color:#ffe8b0}
+.tags{display:flex;flex-direction:column;gap:2px}
+.tg{font-size:9px;padding:1px 5px;border-radius:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tg-c{background:rgba(26,77,122,.5);color:#c8e4ff}
+.tg-a{background:rgba(42,92,10,.5);color:#c8f0b0}
+.tg-i{background:rgba(140,58,24,.6);color:#ffe0d0}
+.tg-g{background:rgba(108,99,255,.15);color:#d0cdff}
+/* OVERLAY detail */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:200;display:none;align-items:center;justify-content:center}
+.ov.open{display:flex}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:12px;width:440px;max-width:95vw;max-height:85vh;overflow-y:auto;padding:24px;position:relative}
+.pdate{font-size:12px;color:var(--muted);margin-bottom:4px}
+.ptitle{font-size:17px;font-weight:600;margin-bottom:16px}
+.psec{margin-bottom:14px}
+.pslabel{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:6px}
+.plocs{display:flex;gap:6px;flex-wrap:wrap}
+.ploc{font-size:12px;padding:4px 12px;border-radius:100px;font-weight:500}
+.pativ{font-size:13px;line-height:1.8}
+.pativ li{margin-left:18px}
+.phor{font-size:13px;color:var(--accent);font-weight:500}
+.xbtn{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;line-height:1}
+.xbtn:hover{color:var(--text)}
+.editbtn{margin-top:16px;width:100%;background:rgba(108,99,255,.15);color:#d0cdff;border:1px solid rgba(108,99,255,.3);padding:9px;border-radius:6px;font-size:13px;cursor:pointer}
+.editbtn:hover{background:rgba(108,99,255,.28)}
+/* EDITOR */
+.eov{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;display:none;align-items:center;justify-content:center}
+.eov.open{display:flex}
+.epanel{background:#1e2128;border:1px solid var(--border);border-radius:12px;width:480px;max-width:95vw;max-height:90vh;overflow-y:auto;padding:24px;position:relative}
+.epanel h3{font-size:16px;font-weight:600;margin-bottom:18px}
+.frow{margin-bottom:16px}
+.frow label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px}
+/* Store toggle grid */
+.store-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.stog{padding:8px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--muted);font-size:12px;cursor:pointer;text-align:center;transition:all .15s;user-select:none}
+.stog:hover{border-color:#6c63ff;color:var(--text)}
+.stog.sel-E{background:#3d3a8c;border-color:#3d3a8c;color:#d0cdff}
+.stog.sel-R{background:#1a4d7a;border-color:#1a4d7a;color:#c8e4ff}
+.stog.sel-S{background:#8c3a18;border-color:#8c3a18;color:#ffe0d0}
+.stog.sel-B{background:#2a5c0a;border-color:#2a5c0a;color:#c8f0b0}
+.stog.sel-A{background:#8c2020;border-color:#8c2020;color:#ffd4d4}
+.stog.sel-M{background:#3a3a46;border-color:#3a3a46;color:#dcdcec}
+.stog.sel-H{background:#6b4a08;border-color:#6b4a08;color:#ffe8b0}
+.frow input,.frow textarea{width:100%;background:#111214;border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;outline:none;transition:border-color .15s}
+.frow input:focus,.frow textarea:focus{border-color:var(--accent)}
+.frow textarea{resize:vertical;min-height:110px;line-height:1.6}
+.fhint{font-size:11px;color:#3a3e48;margin-top:4px}
+.factions{display:flex;gap:8px;margin-top:18px}
+.bsave{flex:1;background:var(--accent);color:#fff;border:none;padding:10px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer}
+.bsave:hover{background:#5a52e0}
+.bclr{background:rgba(140,32,32,.3);color:#ffd4d4;border:1px solid rgba(140,32,32,.4);padding:10px 14px;border-radius:6px;font-size:13px;cursor:pointer}
+.bcan{background:#1a1c20;color:var(--muted);border:1px solid var(--border);padding:10px 14px;border-radius:6px;font-size:13px;cursor:pointer}
+.leg{display:flex;flex-wrap:wrap;gap:10px;padding:10px 20px;border-top:1px solid var(--border);background:var(--surface);position:fixed;bottom:0;left:0;right:0;z-index:50}
+.li{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)}
+.ld{width:8px;height:8px;border-radius:50%}
+.toast{position:fixed;bottom:58px;left:50%;transform:translateX(-50%);background:#2a5c0a;color:#c8f0b0;padding:8px 20px;border-radius:100px;font-size:13px;font-weight:500;z-index:400;animation:fo 2.5s forwards;pointer-events:none}
+@keyframes fo{0%,70%{opacity:1}100%{opacity:0}}
+</style>
+</head>
+<body>
+<header>
+  <div><div class="logo">O BOTICÁRIO · CRONOGRAMA 2026</div><div class="sub">Analista de Estoque &amp; Demanda</div></div>
+  <div class="top-stores" id="topStores"></div>
+  <div class="nav">
+    <button class="nbtn" id="prev">&#8249;</button>
+    <div class="mlabel" id="ml"></div>
+    <button class="nbtn" id="next">&#8250;</button>
+  </div>
+  <div class="filters">
+    <button class="fbtn on" data-f="all">Todos</button>
+    <button class="fbtn" data-f="calib">Calibragem</button>
+    <button class="fbtn" data-f="antilha">Antilhas</button>
+    <button class="fbtn" data-f="invent">Inventário</button>
+    <button class="fbtn" data-f="visita">Visita</button>
+  </div>
+</header>
+<div class="wrap">
+  <div class="wdays"><div class="wd">Dom</div><div class="wd">Seg</div><div class="wd">Ter</div><div class="wd">Qua</div><div class="wd">Qui</div><div class="wd">Sex</div><div class="wd">Sáb</div></div>
+  <div class="grid" id="grid"></div>
+</div>
+<div class="ov" id="ov">
+  <div class="panel">
+    <button class="xbtn" id="xov">&times;</button>
+    <div class="pdate" id="pdate"></div>
+    <div class="ptitle" id="ptitle"></div>
+    <div class="psec" id="plocSec"><div class="pslabel">Lojas visitadas</div><div class="plocs" id="plocs"></div></div>
+    <div class="psec" id="phorSec"><div class="pslabel">Horário</div><div class="phor" id="phor"></div></div>
+    <div class="psec"><div class="pslabel">Atividades</div><div class="pativ" id="pativ"></div></div>
+    <button class="editbtn" id="editbtn">✏️  Editar este dia</button>
+  </div>
+</div>
+<div class="eov" id="eov">
+  <div class="epanel">
+    <button class="xbtn" id="xeov">&times;</button>
+    <h3 id="etitle">Editar dia</h3>
+    <div class="frow">
+      <label>Lojas visitadas — selecione quantas quiser</label>
+      <div class="store-grid" id="storeGrid"></div>
+    </div>
+    <div class="frow"><label>Horário</label><input type="text" id="eHor" placeholder="ex: 17h00 ou 08h00 / 14h00"></div>
+    <div class="frow">
+      <label>Atividades</label>
+      <textarea id="eAtiv" placeholder="Uma atividade por linha:&#10;Calibragem — todas as lojas&#10;Antilhas Assaí e Metro"></textarea>
+      <div class="fhint">Uma por linha — os bullets (•) são adicionados automaticamente ao salvar.</div>
+    </div>
+    <div class="factions">
+      <button class="bsave" id="eSave">Salvar</button>
+      <button class="bclr" id="eClr">Limpar dia</button>
+      <button class="bcan" id="eCan">Cancelar</button>
+    </div>
+  </div>
+</div>
+<div class="leg">
+  <div class="li"><div class="ld" style="background:#3d3a8c"></div>Escritório</div>
+  <div class="li"><div class="ld" style="background:#1a4d7a"></div>Rio Pequeno</div>
+  <div class="li"><div class="ld" style="background:#8c3a18"></div>Shopping</div>
+  <div class="li"><div class="ld" style="background:#2a5c0a"></div>Bonfiglioli</div>
+  <div class="li"><div class="ld" style="background:#8c2020"></div>Assaí</div>
+  <div class="li"><div class="ld" style="background:#3a3a46"></div>Metro/Max</div>
+  <div class="li"><div class="ld" style="background:#6b4a08"></div>HUB/VD</div>
+  <div class="li" style="margin-left:8px"><div class="ld" style="background:#1a4d7a;border-radius:2px"></div>Calibragem</div>
+  <div class="li"><div class="ld" style="background:#2a5c0a;border-radius:2px"></div>Antilhas</div>
+  <div class="li"><div class="ld" style="background:#8c3a18;border-radius:2px"></div>Inventário</div>
+</div>
+<script>
+const MONTHS=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const WDAYS=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const TODAY='2026-07-07';
+const SK='cron2026_edits';
+
+const STORES=[
+  {name:'Escritório',  code:'E'},
+  {name:'Rio Pequeno', code:'R'},
+  {name:'Shopping',    code:'S'},
+  {name:'Bonfiglioli', code:'B'},
+  {name:'Assaí',       code:'A'},
+  {name:'Metro',       code:'M'},
+  {name:'Max',         code:'M'},
+  {name:'HUB / VD',   code:'H'},
+];
+
+const LOC={'Escritório':'E','Rio Pequeno':'R','Shopping':'S','Bonfiglioli':'B',
+  'Assaí':'A','Assai':'A','Metro':'M','Max':'M','HUB / VD':'H','HUB':'H','VD':'H'};
+
+const BASE={"2026-01-01": {"manha": "Escritório", "tarde": "Metro", "horario": "", "ativ": ""}, "2026-01-05": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": "• Pedido Antilhas TODAS AS LOJAS\n• Envio Suprimentos\n• CALIBRAGEM\n• Consulta Promo e BT\n• Sacolas - MAX"}, "2026-01-06": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": "Montar passo a passo Conferencia via Comptar"}, "2026-01-07": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": "Ensinar Conferencia Via Comptar"}, "2026-01-08": {"manha": "Metro", "tarde": "Max", "horario": "", "ativ": "Ensinar Conferencia Via Comptar"}, "2026-01-09": {"manha": "Bonfiglioli", "tarde": "Rio Pequeno", "horario": "", "ativ": "Ensinar Conferencia Via Comptar"}, "2026-01-12": {"manha": "Escritório", "tarde": "", "horario": "", "ativ": "• CALIBRAGEM\n• Consulta Promo e BT\n• Sacolas - MAX\n• Separação e envio Suprimentos e Limpeza - todas as lojas\n• Solicitar coleta Reciclagem - todas as lojas faltantes\n• Informar Wemerson total de volumes"}, "2026-01-13": {"manha": "Bonfiglioli", "tarde": "Assai", "horario": "", "ativ": "Suporte Lojas - Conferencia de mercadoria"}, "2026-01-14": {"manha": "Shopping", "tarde": "Max", "horario": "", "ativ": "Suporte Lojas - Conferencia de mercadoria"}, "2026-01-15": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": "Verificar Suprimentos - TODAS AS LOJAS - Antilhas - ASSAÍ E METRO  - Inicio de Organização Pre inventário (movimentações, proves, etc)"}, "2026-01-16": {"manha": "Rio Pequeno", "tarde": "Rio Pequeno", "horario": "", "ativ": "Verificar e contar GDV de Irregularidade"}, "2026-01-19": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": "• CALIBRAGEM\n• Consulta Promo e BT\n• Sacolas - MAX\n• Organização Pré Inventário"}, "2026-01-20": {"manha": "Rio Pequeno", "tarde": "Bonfiglioli", "horario": "", "ativ": "• Conferencia GDV irregularidade\n• Organização Pré Inventário"}, "2026-01-21": {"manha": "Shopping", "tarde": "Assai", "horario": "", "ativ": "Acompanhamento de Organização Pré Inventário"}, "2026-01-22": {"manha": "Metro", "tarde": "Max", "horario": "", "ativ": "Acompanhamento de Organização Pré Inventário"}, "2026-01-23": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": ""}, "2026-01-24": {"manha": "Shopping", "tarde": "Shopping", "horario": "20h30", "ativ": "INVENTÁRIO SHOPPING"}, "2026-01-25": {"manha": "Shopping", "tarde": "Max", "horario": "07h00 / 14h00", "ativ": "INVENTÁRIO SHOPPING E MAX"}, "2026-01-26": {"manha": "Assai", "tarde": "Assai", "horario": "17h00", "ativ": "• INVENTÁRIO ASSAÍ\n• CALIBRAGEM\n• Consulta Promo e BT\n• Sacolas - MAX"}, "2026-01-27": {"manha": "Bonfiglioli", "tarde": "Metro", "horario": "15h00 / 17h00", "ativ": "INVENTÁRIO METRO E BONFIGLIOLI"}, "2026-01-28": {"manha": "Rio Pequeno", "tarde": "Rio Pequeno", "horario": "16h00", "ativ": "INVENTÁRIO RIO PEQUENO"}, "2026-01-29": {"manha": "Escritório", "tarde": "Escritório", "horario": "09h00", "ativ": "INVENTÁRIO HUB - RETIRADA EM TODAS AS LOJAS"}, "2026-01-30": {"manha": "Escritório", "tarde": "Escritório", "horario": "07h00", "ativ": "• INVENTÁRIO VD\n• Verificar Suprimentos - TODAS AS LOJAS - Antilhas - ASSAÍ E METRO"}, "2026-02-02": {"manha": "Escritório", "tarde": "", "horario": "", "ativ": "• CALIBRAGEM\n• Consulta Promo e BT\n• Pedido Antilhas HUB E VD, SHOPPING, BONFIGLIOLI, RIO PEQUENO - Sacolas - MAX"}, "2026-02-03": {"manha": "Escritório", "tarde": "", "horario": "", "ativ": ""}, "2026-02-04": {"manha": "Escritório", "tarde": "", "horario": "", "ativ": ""}, "2026-02-05": {"manha": "Escritório", "tarde": "", "horario": "", "ativ": ""}, "2026-02-06": {"manha": "Escritório", "tarde": "", "horario": "", "ativ": ""}, "2026-02-09": {"manha": "Escritório", "tarde": "", "horario": "", "ativ": "• CALIBRAGEM\n• Consulta Promo e BT\n• Sacolas - MAX"}, "2026-02-10": {"manha": "Escritório", "tarde": "", "horario": "", "ativ": ""}, "2026-02-11": {"manha": "Escritório", "tarde": "", "horario": "", "ativ": ""}, "2026-02-12": {"manha": "Escritório", "tarde": "", "horario": "", "ativ": ""}, "2026-02-13": {"manha": "Escritório", "tarde": "", "horario": "", "ativ": ""}, "2026-02-16": {"manha": "Escritório", "tarde": "", "horario": "", "ativ": "• CALIBRAGEM\n• Consulta Promo e BT\n• Verificar Suprimentos - TODAS AS LOJAS - Antilhas - ASSAÍ E METRO - Sacolas - MAX"}, "2026-02-17": {"manha": "Escritório", "tarde": "", "horario": "", "ativ": ""}, "2026-02-18": {"manha": "Escritório", "tarde": "", "horario": "", "ativ": ""}, "2026-02-19": {"manha": "Escritório", "tarde": "", "horario": "", "ativ": ""}, "2026-02-20": {"manha": "Escritório", "tarde": "", "horario": "", "ativ": ""}, "2026-02-23": {"manha": "Escritório", "tarde": "", "horario": "", "ativ": "• CALIBRAGEM\n• Consulta Promo e BT\n• Sacolas - MAX"}, "2026-02-24": {"manha": "Escritório", "tarde": "", "horario": "", "ativ": ""}, "2026-02-25": {"manha": "Escritório", "tarde": "", "horario": "", "ativ": ""}, "2026-02-26": {"manha": "Escritório", "tarde": "", "horario": "", "ativ": ""}, "2026-02-27": {"manha": "Escritório", "tarde": "", "horario": "", "ativ": "RETIRADA - TODAS AS LOJAS"}, "2026-03-02": {"manha": "Escritório", "tarde": "", "horario": "", "ativ": "• CALIBRAGEM\n• Consulta Promo e BT\n• Verificar Suprimentos - TODAS AS LOJAS - Antilhas - ASSAÍ E METRO  - Sacolas - MAX"}, "2026-03-03": {"manha": "Escritório", "tarde": "", "horario": "", "ativ": ""}, "2026-03-04": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": "Verificação de pendencias - Movimentações em todas as lojas - Pedidos de Antilhas -"}, "2026-03-05": {"manha": "Max", "tarde": "Metro", "horario": "", "ativ": "Retirada - Verificar Pendencias  e Itens Negativos em estoque"}, "2026-03-06": {"manha": "Assai", "tarde": "Shopping", "horario": "", "ativ": "Retirada - Verificar Pendencias  e Itens Negativos em estoque"}, "2026-03-09": {"manha": "Bonfiglioli", "tarde": "Rio Pequeno", "horario": "", "ativ": "• CALIBRAGEM\n• Consulta Promo e BT\n• Sacolas - MAX - Retirada - Verificar Pendencias  e Itens Negativos em estoque - Recolhimento de Avarias e Vencidos para envio a VD"}, "2026-03-10": {"manha": "Shopping", "tarde": "Shopping", "horario": "", "ativ": "• Recolhimento de Avarias e Vencidos para envio a VD\n• Conferencia de VMs faltantes para compra\n• Compra Antilhas"}, "2026-03-11": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": "• Emissão Coleta Reciclagem todas as lojas - Envio de Material pro Assaí\n• Separação e recolhimento vencidos no Metro"}, "2026-03-12": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": "Estruturar Devoluções de Irergularidades"}, "2026-03-13": {"manha": "Escritório", "tarde": "", "horario": "", "ativ": ""}, "2026-03-16": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": "• CALIBRAGEM TODAS AS LOJAS\n• Consulta Promo e BT\n• Verificar Suprimentos - TODAS AS LOJAS - Antilhas - ASSAÍ E METRO  - Sacolas - MAX"}, "2026-03-17": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": "• Emissão de Recolhimento Lojas\n• VD\n• Hub -\n• Estruturação Provadores - Troca Clientes\n• Calibragem com Otavio"}, "2026-03-18": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": "• Rastreamento de todos os tipos de movimentações p\n• classificar qual TIPO DE OPERAÇÃO utilizar\n• montagem de pautas para a reunião\n• Estudo Inventário Parcial"}, "2026-03-19": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": "• Emissão Calibragem todas as lojas\n• Recolhimento Rio Pequeno\n• Transferencia do MAX p METRO"}, "2026-03-20": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": "Reuniao - Contabilidade"}, "2026-03-24": {"manha": "Rio Pequeno", "tarde": "Rio Pequeno", "horario": "", "ativ": "• CALIBRAGEM\n• Consulta Promo e BT\n• Sacolas - MAX - AJUSTES PRE INVENTÁRIO"}, "2026-03-25": {"manha": "Rio Pequeno", "tarde": "Rio Pequeno", "horario": "16H00", "ativ": "INVENTARIO"}, "2026-03-26": {"manha": "Escritório", "tarde": "Escritório", "horario": "6H00", "ativ": "INVENTARIO"}, "2026-03-27": {"manha": "Escritório", "tarde": "Metro", "horario": "9H00 / 18H00", "ativ": "INVENTARIO  - RETIRADA - TODAS AS LOJAS"}, "2026-03-28": {"manha": "Assai", "tarde": "Shopping", "horario": "17h00 / 21h00", "ativ": "INVENTARIO"}, "2026-03-29": {"manha": "Shopping", "tarde": "Max", "horario": "08H00 / 16H00", "ativ": "INVENTARIO"}, "2026-03-30": {"manha": "Bonfiglioli", "tarde": "Bonfiglioli", "horario": "17h00", "ativ": "• INVENTARIO  - BAIXAS TODAS AS NOTAS PARA MUDANÇA DE TRIBUTAÇÃO CALIBRAGEM\n• Consulta Promo e BT\n• Verificar Suprimentos - TODAS AS LOJAS - Antilhas - ASSAÍ E METRO - Sacolas MAX"}, "2026-03-31": {"manha": "Escritório", "tarde": "Escritório", "horario": "10h00", "ativ": "• Apresentação de Resultados - Pedro\n• Reunião Contabilidade"}, "2026-04-01": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": ""}, "2026-04-06": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": "Sacolas MAX -  NF Retirada todas as lojas - Forms Provadores -"}, "2026-04-07": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": ""}, "2026-04-08": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": ""}, "2026-04-09": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": ""}, "2026-04-10": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": ""}, "2026-04-13": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": "Envio Calibragem para o Bonfiglioli - Reunião Contabilidade - Resoluções NFs emitidas"}, "2026-04-14": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": "• Coleta de todas as Notas P\n• Abertura de Sinistro ( rastreio de Danfes\n• Emissão de Baixa por furto\n• Relatório de Inventário e etc)"}, "2026-04-15": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": "Energização + Reunião IAF"}, "2026-04-16": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": "• Reunião Contabilidade - Resoluções NFs Antilhas - Envio de Suprimentos pro Metro\n• Envio Calibragem pro Bonfa"}, "2026-04-17": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": "• Rastreio de NFs Inutilizadas p\n• Contabilidade - 14121 e 22877\n• Apoio Contabilidade\n• Pedido Mensal Antilhas ER e Hub\n• Envio de Uniforme Assaí, Max e Shopping - Pendencias Assaí c\n• a Thami"}, "2026-04-20": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": "• Apoio Lojas\n• Solicitação de Material Permanentes\n• NF de provadores - Lojas"}, "2026-04-22": {"manha": "ATESTADO", "tarde": "", "horario": "", "ativ": ""}, "2026-04-23": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": "• Solicitação Coleta Reciclagem - Todas as Lojas\n• Automatização Processo de Calibragem\n• Envio de Calibragem do Hub pro Bonfiglioli"}, "2026-04-24": {"manha": "ATESTADO", "tarde": "", "horario": "", "ativ": ""}, "2026-04-27": {"manha": "Bonfiglioli", "tarde": "Bonfiglioli", "horario": "", "ativ": "Correção de Inventário"}, "2026-04-28": {"manha": "Rio Pequeno", "tarde": "Rio Pequeno", "horario": "", "ativ": "• Verificação de Pendencias\n• Correção de Estoque"}, "2026-04-29": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": "• Calibragem - Todas as lojas\n• Baixas Pendentes - Provadores, Defeitos, Trocas"}, "2026-04-30": {"manha": "Shopping", "tarde": "Shopping", "horario": "", "ativ": "Retirada - Todas as Lojas"}, "2026-05-04": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": ""}, "2026-05-05": {"manha": "Shopping", "tarde": "Shopping", "horario": "", "ativ": "• Verificação de Pendencias\n• Correção de Estoque"}, "2026-05-06": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": "Calibragem - Cobertura dia das Maes Todas as Lojas"}, "2026-05-07": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": "• Verificação de Pendencias\n• Correção de Estoque com TELMA\n• Calibragem entre Hub e VD para cobertura de dias das Maes"}, "2026-05-08": {"manha": "Shopping", "tarde": "Shopping", "horario": "", "ativ": "• Verificação de Pendencias\n• Correção de Estoque"}, "2026-05-11": {"manha": "Rio Pequeno", "tarde": "Rio Pequeno", "horario": "", "ativ": "Verificação de Organização das lojas Pré-Inventário"}, "2026-05-12": {"manha": "Metro", "tarde": "Max", "horario": "", "ativ": "Verificação de Organização das lojas Pré-Inventário"}, "2026-05-13": {"manha": "Shopping", "tarde": "Assai", "horario": "", "ativ": "Verificação de Organização das lojas Pré-Inventário"}, "2026-05-14": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": "Verificação de Organização das lojas Pré-Inventário"}, "2026-05-15": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": "• Calibragem - Todas as lojas\n• Baixas Pendentes - Provadores, Defeitos, Trocas\n• Antilhas - ASSAÍ E METRO"}, "2026-05-19": {"manha": "Rio Pequeno", "tarde": "Rio Pequeno", "horario": "", "ativ": "INVENTÁRIO"}, "2026-05-20": {"manha": "Max", "tarde": "Metro", "horario": "", "ativ": "INVENTÁRIO"}, "2026-05-21": {"manha": "Bonfiglioli", "tarde": "Bonfiglioli", "horario": "", "ativ": "INVENTÁRIO"}, "2026-05-22": {"manha": "Assai", "tarde": "Assai", "horario": "", "ativ": "INVENTÁRIO"}, "2026-05-23": {"manha": "", "tarde": "", "horario": "ER / ER", "ativ": "INVENTÁRIO"}, "2026-05-24": {"manha": "", "tarde": "", "horario": "SHOPPING / SHOPPING", "ativ": "INVENTÁRIO"}, "2026-05-25": {"manha": "Escritório", "tarde": "Escritório", "horario": "HUB / HUB", "ativ": "• INVENTÁRIO  - Calibragem - Todas as lojas\n• Baixas Pendentes - Provadores, Defeitos, Trocas"}, "2026-05-26": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": "Reunião Pedro - Resultado de Inventário"}, "2026-05-27": {"manha": "Assai", "tarde": "Metro", "horario": "", "ativ": "Organização CAIXAS - atualizações e correções"}, "2026-05-28": {"manha": "Rio Pequeno", "tarde": "Rio Pequeno", "horario": "", "ativ": "Validação de Inventário"}, "2026-06-01": {"manha": "Assai", "tarde": "Assai", "horario": "", "ativ": "Validação de Inventário"}, "2026-06-02": {"manha": "Shopping", "tarde": "Shopping", "horario": "", "ativ": "Validação de Inventário"}, "2026-06-03": {"manha": "Max", "tarde": "Max", "horario": "", "ativ": "Validação de Inventário"}, "2026-06-05": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": "Retirada - TODAS AS LOJAS"}, "2026-06-08": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": "• Calibragem - HUB E VD\n• Baixas Pendentes - Provadores, Defeitos, Trocas  - Antilhas HUB, VD, BONFIGLIOLI E SHOPPING (30 DIAS) ASSAÍ E METRO (15 DIAS)\n• Validação de Inventário na VD"}, "2026-06-09": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": "• Estudo e automatização das calibragens - Lojas - VD - HUB\n• Solicitação Coleta Reciclagem - Todas as lojas\n• Validação de Inventário na VD"}, "2026-06-10": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": ""}, "2026-06-11": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": ""}, "2026-06-12": {"manha": "Shopping", "tarde": "Shopping", "horario": "", "ativ": ""}, "2026-06-15": {"manha": "Bonfiglioli", "tarde": "Bonfiglioli", "horario": "", "ativ": "• Organização p\n• reforma\n• Mudança de Ciclo"}, "2026-06-16": {"manha": "Escritório", "tarde": "", "horario": "", "ativ": ""}, "2026-06-22": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": "• Antilhas ASSAÍ E METRO (15 DIAS)\n• Calibragem VD E HUB\n• Atualização da planilha de controle de embalagens"}, "2026-06-23": {"manha": "Rio Pequeno", "tarde": "Rio Pequeno", "horario": "", "ativ": "Recolhimento de itens vencidos, com baixa no estoque e encaminhamento à VD. Análise do estoque de embalagens na loja para avaliação da necessidade de reposição."}, "2026-06-24": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": "Tratativa e regularização de pendências referentes a provadores, itens com defeito e avarias reportados pelas lojas."}, "2026-06-25": {"manha": "Shopping", "tarde": "Shopping", "horario": "", "ativ": "• Envio Bobinas e Suprimentos\n• Organização Pré Inventário solicitado pela Gerencia"}, "2026-06-26": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": "Retirada - Todas as Lojas"}, "2026-06-29": {"manha": "", "tarde": "", "horario": "", "ativ": "DAY OFF"}, "2026-06-30": {"manha": "Rio Pequeno", "tarde": "Rio Pequeno", "horario": "", "ativ": "• Separação de Maquiagem p\n• Envio - Outras Lojas"}, "2026-07-03": {"manha": "", "tarde": "", "horario": "", "ativ": "• Calibragem de equilíbrio — ajuste de estoque entre lojas\n• Verificação de movimentações ER e VD"}, "2026-07-06": {"manha": "", "tarde": "", "horario": "", "ativ": "• Antilhas HUB, VD, BONFIGLIOLI E SHOPPING (30 DIAS) ASSAÍ E METRO (15 DIAS)\n• Calibragem analítica — análise de vendas, promoções e BT de todas as lojas"}, "2026-07-10": {"manha": "", "tarde": "", "horario": "", "ativ": "• Calibragem de equilíbrio — ajuste de estoque entre lojas\n• Verificação de movimentações ER e VD"}, "2026-07-13": {"manha": "", "tarde": "", "horario": "", "ativ": "Calibragem analítica — análise de vendas, promoções e BT de todas as lojas"}, "2026-07-17": {"manha": "", "tarde": "", "horario": "", "ativ": "• Calibragem de equilíbrio — ajuste de estoque entre lojas\n• Verificação de movimentações ER e VD"}, "2026-07-20": {"manha": "", "tarde": "", "horario": "", "ativ": "• Antilhas ASSAÍ E METRO (15 DIAS) - Mudança de Ciclo\n• Calibragem analítica — análise de vendas, promoções e BT de todas as lojas"}, "2026-07-23": {"manha": "16h00", "tarde": "", "horario": "RIO PEQUENO / 23h30", "ativ": "INVENTÁRIO"}, "2026-07-24": {"manha": "18h00", "tarde": "", "horario": "HUB / 22h30", "ativ": "• INVENTÁRIO\n• Calibragem de equilíbrio — ajuste de estoque entre lojas\n• Verificação de movimentações ER e VD"}, "2026-07-25": {"manha": "08h00", "tarde": "", "horario": "ER / 19h00", "ativ": "INVENTÁRIO"}, "2026-07-26": {"manha": "06h00", "tarde": "", "horario": "SHOPPING / 14h00", "ativ": "INVENTÁRIO"}, "2026-07-27": {"manha": "16h00", "tarde": "", "horario": "METRO / 23h00", "ativ": "• INVENTÁRIO\n• Calibragem analítica — análise de vendas, promoções e BT de todas as lojas"}, "2026-07-28": {"manha": "08h00", "tarde": "", "horario": "HUB / 19h00", "ativ": "INVENTÁRIO"}, "2026-07-29": {"manha": "16h00", "tarde": "", "horario": "ASSAI / 23h00", "ativ": "INVENTÁRIO"}, "2026-07-30": {"manha": "16h00", "tarde": "", "horario": "BONFIGLIOLI / 23h00", "ativ": "INVENTÁRIO"}, "2026-07-31": {"manha": "Escritório", "tarde": "Escritório", "horario": "", "ativ": "• APRESENTAÇÃO DE INVENTÁRIO\n• Calibragem de equilíbrio — ajuste de estoque entre lojas\n• Verificação de movimentações ER e VD"}, "2026-08-03": {"manha": "", "tarde": "", "horario": "", "ativ": "• Antilhas HUB, VD, BONFIGLIOLI E SHOPPING (30 DIAS) ASSAÍ E METRO (15 DIAS)\n• Calibragem analítica — análise de vendas, promoções e BT de todas as lojas"}, "2026-08-07": {"manha": "", "tarde": "", "horario": "", "ativ": "• Calibragem de equilíbrio — ajuste de estoque entre lojas\n• Verificação de movimentações ER e VD"}, "2026-08-10": {"manha": "", "tarde": "", "horario": "", "ativ": "• Mudança de Ciclo\n• Calibragem analítica — análise de vendas, promoções e BT de todas as lojas"}, "2026-08-14": {"manha": "", "tarde": "", "horario": "", "ativ": "• Calibragem de equilíbrio — ajuste de estoque entre lojas\n• Verificação de movimentações ER e VD"}, "2026-08-17": {"manha": "", "tarde": "", "horario": "", "ativ": "Calibragem analítica — análise de vendas, promoções e BT de todas as lojas"}, "2026-08-18": {"manha": "", "tarde": "", "horario": "", "ativ": "Antilhas Assaí e Metro (15 dias)"}, "2026-08-21": {"manha": "", "tarde": "", "horario": "", "ativ": "• Calibragem de equilíbrio — ajuste de estoque entre lojas\n• Verificação de movimentações ER e VD"}, "2026-08-24": {"manha": "", "tarde": "", "horario": "", "ativ": "Calibragem analítica — análise de vendas, promoções e BT de todas as lojas"}, "2026-08-28": {"manha": "", "tarde": "", "horario": "", "ativ": "• Calibragem de equilíbrio — ajuste de estoque entre lojas\n• Verificação de movimentações ER e VD"}, "2026-08-31": {"manha": "", "tarde": "", "horario": "", "ativ": "Calibragem analítica — análise de vendas, promoções e BT de todas as lojas"}, "2026-09-02": {"manha": "", "tarde": "", "horario": "", "ativ": "Antilhas Assaí e Metro (15 dias) + HUB, VD, Shopping, Bonfiglioli, Rio Pequeno e ER (30 dias)"}, "2026-09-04": {"manha": "", "tarde": "", "horario": "", "ativ": "• Calibragem de equilíbrio — ajuste de estoque entre lojas\n• Verificação de movimentações ER e VD"}, "2026-09-07": {"manha": "", "tarde": "", "horario": "", "ativ": "Calibragem analítica — análise de vendas, promoções e BT de todas as lojas"}, "2026-09-11": {"manha": "", "tarde": "", "horario": "", "ativ": "• Calibragem de equilíbrio — ajuste de estoque entre lojas\n• Verificação de movimentações ER e VD"}, "2026-09-14": {"manha": "", "tarde": "", "horario": "", "ativ": "Calibragem analítica — análise de vendas, promoções e BT de todas as lojas"}, "2026-09-17": {"manha": "", "tarde": "", "horario": "", "ativ": "Antilhas Assaí e Metro (15 dias)"}, "2026-09-18": {"manha": "", "tarde": "", "horario": "", "ativ": "• Calibragem de equilíbrio — ajuste de estoque entre lojas\n• Verificação de movimentações ER e VD"}, "2026-09-21": {"manha": "", "tarde": "", "horario": "", "ativ": "Calibragem analítica — análise de vendas, promoções e BT de todas as lojas"}, "2026-09-25": {"manha": "", "tarde": "", "horario": "", "ativ": "• Calibragem de equilíbrio — ajuste de estoque entre lojas\n• Verificação de movimentações ER e VD"}, "2026-09-28": {"manha": "", "tarde": "", "horario": "", "ativ": "Calibragem analítica — análise de vendas, promoções e BT de todas as lojas"}, "2026-10-02": {"manha": "", "tarde": "", "horario": "", "ativ": "• Calibragem de equilíbrio — ajuste de estoque entre lojas\n• Verificação de movimentações ER e VD\n• Antilhas Assaí e Metro (15 dias) + HUB, VD, Shopping, Bonfiglioli, Rio Pequeno e ER (30 dias)"}, "2026-10-05": {"manha": "", "tarde": "", "horario": "", "ativ": "Calibragem analítica — análise de vendas, promoções e BT de todas as lojas"}, "2026-10-09": {"manha": "", "tarde": "", "horario": "", "ativ": "• Calibragem de equilíbrio — ajuste de estoque entre lojas\n• Verificação de movimentações ER e VD"}, "2026-10-12": {"manha": "", "tarde": "", "horario": "", "ativ": "Calibragem analítica — análise de vendas, promoções e BT de todas as lojas"}, "2026-10-16": {"manha": "", "tarde": "", "horario": "", "ativ": "• Calibragem de equilíbrio — ajuste de estoque entre lojas\n• Verificação de movimentações ER e VD"}, "2026-10-19": {"manha": "", "tarde": "", "horario": "", "ativ": "• Calibragem analítica — análise de vendas, promoções e BT de todas as lojas\n• Antilhas Assaí e Metro (15 dias)"}, "2026-10-23": {"manha": "", "tarde": "", "horario": "", "ativ": "• Calibragem de equilíbrio — ajuste de estoque entre lojas\n• Verificação de movimentações ER e VD"}, "2026-10-26": {"manha": "", "tarde": "", "horario": "", "ativ": "Calibragem analítica — análise de vendas, promoções e BT de todas as lojas"}, "2026-10-30": {"manha": "", "tarde": "", "horario": "", "ativ": "• Calibragem de equilíbrio — ajuste de estoque entre lojas\n• Verificação de movimentações ER e VD"}, "2026-11-02": {"manha": "", "tarde": "", "horario": "", "ativ": "Calibragem analítica — análise de vendas, promoções e BT de todas as lojas"}, "2026-11-03": {"manha": "", "tarde": "", "horario": "", "ativ": "Antilhas Assaí e Metro (15 dias)"}, "2026-11-06": {"manha": "", "tarde": "", "horario": "", "ativ": "• Calibragem de equilíbrio — ajuste de estoque entre lojas\n• Verificação de movimentações ER e VD"}, "2026-11-09": {"manha": "", "tarde": "", "horario": "", "ativ": "Calibragem analítica — análise de vendas, promoções e BT de todas as lojas"}, "2026-11-13": {"manha": "", "tarde": "", "horario": "", "ativ": "• Calibragem de equilíbrio — ajuste de estoque entre lojas\n• Verificação de movimentações ER e VD"}, "2026-11-16": {"manha": "", "tarde": "", "horario": "", "ativ": "Calibragem analítica — análise de vendas, promoções e BT de todas as lojas"}, "2026-11-18": {"manha": "", "tarde": "", "horario": "", "ativ": "Antilhas Assaí e Metro (15 dias)"}, "2026-11-20": {"manha": "", "tarde": "", "horario": "", "ativ": "• Calibragem de equilíbrio — ajuste de estoque entre lojas\n• Verificação de movimentações ER e VD"}, "2026-11-23": {"manha": "", "tarde": "", "horario": "", "ativ": "Calibragem analítica — análise de vendas, promoções e BT de todas as lojas"}, "2026-11-27": {"manha": "", "tarde": "", "horario": "", "ativ": "• Calibragem de equilíbrio — ajuste de estoque entre lojas\n• Verificação de movimentações ER e VD"}, "2026-11-30": {"manha": "", "tarde": "", "horario": "", "ativ": "Calibragem analítica — análise de vendas, promoções e BT de todas as lojas"}, "2026-12-03": {"manha": "", "tarde": "", "horario": "", "ativ": "Antilhas Assaí e Metro (15 dias)"}, "2026-12-04": {"manha": "", "tarde": "", "horario": "", "ativ": "• Calibragem de equilíbrio — ajuste de estoque entre lojas\n• Verificação de movimentações ER e VD"}, "2026-12-07": {"manha": "", "tarde": "", "horario": "", "ativ": "Calibragem analítica — análise de vendas, promoções e BT de todas as lojas"}, "2026-12-11": {"manha": "", "tarde": "", "horario": "", "ativ": "• Calibragem de equilíbrio — ajuste de estoque entre lojas\n• Verificação de movimentações ER e VD"}, "2026-12-14": {"manha": "", "tarde": "", "horario": "", "ativ": "Calibragem analítica — análise de vendas, promoções e BT de todas as lojas"}, "2026-12-18": {"manha": "", "tarde": "", "horario": "", "ativ": "• Calibragem de equilíbrio — ajuste de estoque entre lojas\n• Verificação de movimentações ER e VD\n• Antilhas Assaí e Metro (15 dias)"}, "2026-12-21": {"manha": "", "tarde": "", "horario": "", "ativ": "Calibragem analítica — análise de vendas, promoções e BT de todas as lojas"}, "2026-12-25": {"manha": "", "tarde": "", "horario": "", "ativ": "• Calibragem de equilíbrio — ajuste de estoque entre lojas\n• Verificação de movimentações ER e VD"}, "2026-12-28": {"manha": "", "tarde": "", "horario": "", "ativ": "Calibragem analítica — análise de vendas, promoções e BT de todas as lojas"}};
+
+let DATA=Object.assign({},BASE);
+try{const s=JSON.parse(localStorage.getItem(SK)||'{}');Object.assign(DATA,s);}catch(e){}
+
+let month=6,year=2026,filter='all',openKey=null;
+
+function key(y,m,d){return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
+
+function getStores(e){
+  if(!e)return[];
+  if(e.lojas&&e.lojas.length)return e.lojas;
+  const r=[];
+  if(e.manha&&e.manha.trim()&&!/^\d/.test(e.manha)&&e.manha!=='')r.push(e.manha);
+  if(e.tarde&&e.tarde.trim()&&!/^\d/.test(e.tarde)&&e.tarde!==''&&e.tarde!==e.manha)r.push(e.tarde);
+  return[...new Set(r)];
+}
+
+function cat(t){
+  const s=(t||'').toLowerCase();
+  if(s.includes('invent'))return'i';
+  if(s.includes('antilha'))return'a';
+  if(s.includes('calibragem'))return'c';
+  return'g';
+}
+
+function isVisit(e){
+  return getStores(e).some(l=>!['Escritório'].includes(l));
+}
+
+function matchFilter(e){
+  if(filter==='all')return true;
+  const t=(e.ativ||'').toLowerCase();
+  if(filter==='calib')return t.includes('calibragem');
+  if(filter==='antilha')return t.includes('antilha');
+  if(filter==='invent')return t.includes('invent');
+  if(filter==='visita')return isVisit(e);
+  return true;
+}
+
+function calcTopStores(){
+  const counts={};
+  const prefix=`${year}-${String(month+1).padStart(2,'0')}-`;
+  Object.keys(DATA).filter(k=>k.startsWith(prefix)).forEach(k=>{
+    getStores(DATA[k]).forEach(s=>{
+      counts[s]=(counts[s]||0)+1;
+    });
+  });
+  return Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,4);
+}
+
+function renderTopStores(){
+  const el=document.getElementById('topStores');
+  const top=calcTopStores();
+  if(!top.length){el.innerHTML='<span class="ts-label">Nenhuma visita registrada</span>';return;}
+  el.innerHTML='<span class="ts-label">+ visitadas:</span>'+top.map(([name,cnt])=>{
+    const c=LOC[name]||'E';
+    return`<span class="ts-pill pl-${c}">${name}<span class="ts-count">×${cnt}</span></span>`;
+  }).join('');
+}
+
+function render(){
+  const grid=document.getElementById('grid');
+  grid.innerHTML='';
+  document.getElementById('ml').textContent=`${MONTHS[month]} ${year}`;
+  renderTopStores();
+
+  const first=new Date(year,month,1).getDay();
+  const total=new Date(year,month+1,0).getDate();
+  const prev=new Date(year,month,0).getDate();
+
+  for(let i=first-1;i>=0;i--){
+    const el=document.createElement('div');
+    el.className='day other';
+    el.innerHTML=`<div class="dn">${prev-i}</div>`;
+    grid.appendChild(el);
+  }
+
+  for(let d=1;d<=total;d++){
+    const k=key(year,month,d);
+    const e=DATA[k];
+    const dt=new Date(year,month,d);
+    const wd=dt.getDay();
+    const isWkd=wd===0||wd===6;
+    const isToday=k===TODAY;
+    const hasInv=e&&(e.ativ||'').toLowerCase().includes('invent');
+    const matched=!e||matchFilter(e);
+
+    let cls='day';
+    if(isWkd)cls+=' wkd';
+    if(isToday)cls+=' today';
+    if(hasInv)cls+=' inv';
+    if(e&&filter!=='all'&&!matched)cls+=' dim';
+
+    const el=document.createElement('div');
+    el.className=cls;
+    let h=`<div class="dn">${d}</div>`;
+
+    if(e){
+      const locs=getStores(e);
+      if(locs.length){
+        h+='<div class="pills">';
+        locs.forEach(l=>{
+          const c=LOC[l]||'E';
+          const n=l.length>9?l.slice(0,9)+'…':l;
+          h+=`<span class="pl pl-${c}">${n}</span>`;
+        });
+        h+='</div>';
+      }
+      if(e.ativ){
+        const lines=e.ativ.split('\n').filter(Boolean).slice(0,3);
+        h+='<div class="tags">';
+        lines.forEach(line=>{
+          const clean=line.replace(/^[•\-\s]+/,'').trim();
+          if(!clean)return;
+          const label=clean.length>30?clean.slice(0,30)+'…':clean;
+          h+=`<span class="tg tg-${cat(clean)}">${label}</span>`;
+        });
+        h+='</div>';
+      }
+      el.addEventListener('click',()=>openPanel(k,d,e));
+    } else {
+      el.addEventListener('click',()=>openEditor(k));
+    }
+
+    el.innerHTML=h;
+    grid.appendChild(el);
+  }
+
+  const used=first+total;
+  const rem=used%7===0?0:7-(used%7);
+  for(let i=1;i<=rem;i++){
+    const el=document.createElement('div');
+    el.className='day other';
+    el.innerHTML=`<div class="dn">${i}</div>`;
+    grid.appendChild(el);
+  }
+}
+
+function openPanel(k,d,e){
+  openKey=k;
+  const dt=new Date(year,month,d);
+  document.getElementById('pdate').textContent=`${WDAYS[dt.getDay()]}, ${String(d).padStart(2,'0')}/${String(month+1).padStart(2,'0')}/${year}`;
+  const t=(e.ativ||'').toLowerCase();
+  let title='Dia sem atividade registrada';
+  if(t.includes('invent'))title='Inventário';
+  else if(t.includes('antilha')&&t.includes('calibragem'))title='Antilhas + Calibragem';
+  else if(t.includes('antilha'))title='Pedido de Antilhas';
+  else if(t.includes('calibragem'))title='Calibragem';
+  else if(isVisit(e))title='Visita às Lojas';
+  else if(e.ativ)title='Atividades do dia';
+  document.getElementById('ptitle').textContent=title;
+
+  const locs=getStores(e);
+  const locsEl=document.getElementById('plocs');
+  locsEl.innerHTML='';
+  locs.forEach(l=>{const c=LOC[l]||'E';const s=document.createElement('span');s.className=`ploc pl-${c}`;s.textContent=l;locsEl.appendChild(s);});
+  document.getElementById('plocSec').style.display=locs.length?'':'none';
+
+  if(e.horario){document.getElementById('phor').textContent=e.horario;document.getElementById('phorSec').style.display='';}
+  else{document.getElementById('phorSec').style.display='none';}
+
+  const at=document.getElementById('pativ');
+  if(e.ativ){
+    const lines=e.ativ.split('\n').filter(Boolean);
+    at.innerHTML='<ul>'+lines.map(l=>`<li>${l.replace(/^[•\-\s]+/,'').trim()}</li>`).join('')+'</ul>';
+  } else {at.innerHTML='<span style="color:var(--muted)">Nenhuma atividade registrada.</span>';}
+
+  document.getElementById('ov').classList.add('open');
+}
+
+// Build store toggle grid
+function buildStoreGrid(selectedNames){
+  const grid=document.getElementById('storeGrid');
+  grid.innerHTML='';
+  STORES.forEach(({name,code})=>{
+    const btn=document.createElement('div');
+    btn.className='stog';
+    btn.textContent=name;
+    btn.dataset.name=name;
+    btn.dataset.code=code;
+    if(selectedNames.includes(name))btn.classList.add(`sel-${code}`);
+    btn.addEventListener('click',()=>{
+      const active=btn.classList.contains(`sel-${code}`);
+      btn.classList.toggle(`sel-${code}`,!active);
+    });
+    grid.appendChild(btn);
+  });
+}
+
+function getSelectedStores(){
+  return [...document.querySelectorAll('.stog')].filter(b=>{
+    const c=b.dataset.code;
+    return b.classList.contains(`sel-${c}`);
+  }).map(b=>b.dataset.name);
+}
+
+function openEditor(k,fromPanel){
+  openKey=k;
+  const e=DATA[k]||{};
+  const parts=k.split('-');
+  const dt=new Date(+parts[0],+parts[1]-1,+parts[2]);
+  document.getElementById('etitle').textContent=`${WDAYS[dt.getDay()]}, ${parts[2]}/${parts[1].replace(/^0/,'')}/${parts[0]}`;
+  buildStoreGrid(getStores(e));
+  document.getElementById('eHor').value=e.horario||'';
+  const lines=(e.ativ||'').split('\n').map(l=>l.replace(/^[•\-\s]+/,'').trim()).filter(Boolean);
+  document.getElementById('eAtiv').value=lines.join('\n');
+  if(fromPanel)document.getElementById('ov').classList.remove('open');
+  document.getElementById('eov').classList.add('open');
+  document.getElementById('eAtiv').focus();
+}
+
+function saveEdit(){
+  const k=openKey;if(!k)return;
+  const lojas=getSelectedStores();
+  const horario=document.getElementById('eHor').value.trim();
+  const raw=document.getElementById('eAtiv').value.trim();
+  const lines=raw.split('\n').map(l=>l.replace(/^[•\-\s]+/,'').trim()).filter(Boolean);
+  const ativ=lines.length>1?lines.map(l=>'• '+l).join('\n'):(lines[0]||'');
+  const entry={lojas,horario,ativ};
+  DATA[k]=entry;
+  try{const s=JSON.parse(localStorage.getItem(SK)||'{}');s[k]=entry;localStorage.setItem(SK,JSON.stringify(s));}catch(e){}
+  document.getElementById('eov').classList.remove('open');
+  toast('✓ Dia atualizado');render();
+}
+
+function clearDay(){
+  const k=openKey;if(!k)return;
+  if(!confirm('Limpar todas as atividades deste dia?'))return;
+  delete DATA[k];
+  try{const s=JSON.parse(localStorage.getItem(SK)||'{}');delete s[k];localStorage.setItem(SK,JSON.stringify(s));}catch(e){}
+  document.getElementById('eov').classList.remove('open');
+  toast('Dia limpo');render();
+}
+
+function toast(msg){
+  const b=document.createElement('div');b.className='toast';b.textContent=msg;
+  document.body.appendChild(b);setTimeout(()=>b.remove(),2700);
+}
+
+document.getElementById('prev').onclick=()=>{month--;if(month<0){month=11;year--;}render();};
+document.getElementById('next').onclick=()=>{month++;if(month>11){month=0;year++;}render();};
+document.getElementById('xov').onclick=()=>document.getElementById('ov').classList.remove('open');
+document.getElementById('ov').onclick=e=>{if(e.target===document.getElementById('ov'))document.getElementById('ov').classList.remove('open');};
+document.getElementById('editbtn').onclick=()=>openEditor(openKey,true);
+document.getElementById('xeov').onclick=()=>document.getElementById('eov').classList.remove('open');
+document.getElementById('eov').onclick=e=>{if(e.target===document.getElementById('eov'))document.getElementById('eov').classList.remove('open');};
+document.getElementById('eSave').onclick=saveEdit;
+document.getElementById('eClr').onclick=clearDay;
+document.getElementById('eCan').onclick=()=>document.getElementById('eov').classList.remove('open');
+document.querySelectorAll('.fbtn').forEach(b=>{
+  b.onclick=()=>{document.querySelectorAll('.fbtn').forEach(x=>x.classList.remove('on'));b.classList.add('on');filter=b.dataset.f;render();};
+});
+
+render();
+</script>
+</body>
+</html>
